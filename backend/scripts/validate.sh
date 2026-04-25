@@ -18,13 +18,5 @@ node --check backend/server.js
 echo "== 3) contrato en .env vs cadena (perfil on-chain) =="
 node scripts/check-onchain.cjs
 
-echo "== 4) CSS (opcional, si tocaste clases Tailwind) =="
-if [ "${SKIP_CSS:-0}" = "1" ]; then
-  echo "  omitido (SKIP_CSS=1)"
-else
-  npm run build:css --silent
-  echo "  tailwind OK"
-fi
-
 echo ""
 echo "=== validate: todo OK ==="

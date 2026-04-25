@@ -1,0 +1,398 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MyHealth API",
+    "description": "API REST para leer y escribir la ficha médica **MyHealth** en Monad testnet (chainId 10143). Las operaciones de escritura las firma el servidor con `PRIVATE_KEY` del `.env`; el firmante debe ser **owner** del contrato o **autorizado para editar** (salvo traspaso de propiedad y autorización de editores, que solo las ejecuta el **owner**).\n\n**Contrato por defecto:** `MYHEALTH_CONTRACT_ADDRESS` en `.env`. En cualquier ruta puedes anular con query `?contract=0x...` o con `contract` en el cuerpo JSON.\n\n**Mapa de emergencias:** si `MAPA_EMERGENCIA_KEY` está definida, POST y DELETE de `/api/mapa-de-emergencias/alerta` exigen `Authorization: Bearer <clave>` o header `X-Mapa-Key`.\n\n**On-chain mapa:** con `MAPA_EMERGENCIA_ONCHAIN=1` el mapa se lee/escribe en el contrato (`registrarEmergenciaMapa` / `limpiarEmergenciaMapa`).",
+    "version": "1.0.0",
+    "contact": { "name": "MyHealth" }
+  },
+  "servers": [],
+  "tags": [
+    { "name": "Sistema", "description": "Salud y metadatos del API" },
+    { "name": "Lectura", "description": "Consultas on-chain (sin firmar)" },
+    { "name": "Ficha", "description": "Actualización de datos médicos y perfil (transacciones firmadas por el servidor)" },
+    { "name": "Contactos", "description": "Contactos de emergencia on-chain" },
+    { "name": "Emergencia", "description": "Lectura de emergencia y notificaciones" },
+    { "name": "Mapa", "description": "Alerta geolocalizada (memoria o contrato según configuración)" },
+    { "name": "Contrato", "description": "Administración del contrato (solo propietario)" }
+  ],
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": { "error": { "type": "string" } }
+      },
+      "ContractQuery": {
+        "type": "object",
+        "properties": {
+          "contract": {
+            "type": "string",
+            "description": "Dirección del contrato MyHealth (checksum opcional). Si se omite, se usa MYHEALTH_CONTRACT_ADDRESS."
+          }
+        }
+      },
+      "FichaActualizar": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContractQuery" },
+          {
+            "type": "object",
+            "properties": {
+              "alergias": { "type": "string" },
+              "condiciones": { "type": "string" },
+              "medicacion": { "type": "string" },
+              "notaEmergencia": { "type": "string" },
+              "fotoUrl": { "type": "string" },
+              "religion": { "type": "string" },
+              "numeroSeguroSocial": { "type": "string" },
+              "tipoSangre": { "type": "string" },
+              "perfilNombre": { "type": "string" },
+              "perfilApellido": { "type": "string" },
+              "perfilTelefono": { "type": "string" },
+              "perfilCorreo": { "type": "string" },
+              "notificar": {
+                "type": "boolean",
+                "description": "Si true, notifica por SMS/email a contactos activos tras guardar"
+              }
+            }
+          }
+        ]
+      },
+      "PatchDatos": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContractQuery" },
+          {
+            "type": "object",
+            "description": "Exactamente uno de los campos de ficha (además de contract opcional).",
+            "properties": {
+              "alergias": { "type": "string" },
+              "condiciones": { "type": "string" },
+              "medicacion": { "type": "string" },
+              "notaEmergencia": { "type": "string" },
+              "fotoUrl": { "type": "string" },
+              "religion": { "type": "string" },
+              "numeroSeguroSocial": { "type": "string" },
+              "tipoSangre": { "type": "string" },
+              "perfilNombre": { "type": "string" },
+              "perfilApellido": { "type": "string" },
+              "perfilTelefono": { "type": "string" },
+              "perfilCorreo": { "type": "string" },
+              "notificar": { "type": "boolean" }
+            }
+          }
+        ]
+      },
+      "NuevoContacto": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContractQuery" },
+          {
+            "type": "object",
+            "properties": {
+              "nombre": { "type": "string" },
+              "parentesco": { "type": "string" },
+              "telefono": { "type": "string" },
+              "email": { "type": "string" }
+            }
+          }
+        ]
+      },
+      "EmergenciaAlertaBody": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContractQuery" },
+          {
+            "type": "object",
+            "properties": {
+              "registrarSoloLectura": {
+                "type": "boolean",
+                "description": "Si true y hay PRIVATE_KEY, envía `registrarLecturaEmergencia()` on-chain"
+              },
+              "notificar": {
+                "type": "boolean",
+                "description": "Si false, no envía avisos a contactos"
+              },
+              "mensaje": { "type": "string", "description": "Cuerpo del aviso a contactos" }
+            }
+          }
+        ]
+      },
+      "MapaAlertaPost": {
+        "type": "object",
+        "required": ["lat", "lng"],
+        "properties": {
+          "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+          "lng": { "type": "number", "minimum": -180, "maximum": 180 },
+          "nombrePaciente": { "type": "string" },
+          "detalle": { "type": "string" },
+          "contract": { "type": "string" }
+        }
+      },
+      "TransferirPropiedad": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContractQuery" },
+          {
+            "type": "object",
+            "required": ["nuevo"],
+            "properties": {
+              "nuevo": {
+                "type": "string",
+                "description": "Nueva dirección owner (0x...)"
+              }
+            }
+          }
+        ]
+      },
+      "SetAutorizado": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ContractQuery" },
+          {
+            "type": "object",
+            "required": ["cuenta", "permitido"],
+            "properties": {
+              "cuenta": { "type": "string", "description": "Cuenta a autorizar o revocar" },
+              "permitido": { "type": "boolean" }
+            }
+          }
+        ]
+      }
+    },
+    "parameters": {
+      "ContractQuery": {
+        "name": "contract",
+        "in": "query",
+        "schema": { "type": "string" },
+        "description": "Contrato MyHealth (opcional si está en .env)"
+      }
+    },
+    "securitySchemes": {
+      "MapaApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Mapa-Key",
+        "description": "O bien `Authorization: Bearer <MAPA_EMERGENCIA_KEY>`"
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Comprobación de vida",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "servicio": { "type": "string" },
+                    "ok": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Metadatos del servicio (red, contrato por defecto, enlaces a documentación)",
+        "responses": { "200": { "description": "JSON de información" } }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Especificación OpenAPI 3 (JSON)",
+        "responses": { "200": { "description": "OpenAPI" } }
+      }
+    },
+    "/api/datos": {
+      "get": {
+        "tags": ["Lectura"],
+        "summary": "Leer datos médicos básicos, identificación y perfil",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": {
+          "200": { "description": "Ficha parcial" },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Ficha"],
+        "summary": "Actualizar un solo campo de la ficha",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/PatchDatos" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Hash tx" },
+          "400": { "description": "Ningún campo reconocido" }
+        }
+      }
+    },
+    "/api/ficha": {
+      "get": {
+        "tags": ["Lectura"],
+        "summary": "Ficha completa + contactos activos",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": {
+          "200": { "description": "Ficha y contactos" },
+          "500": {
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/contactos": {
+      "get": {
+        "tags": ["Lectura"],
+        "summary": "Listar contactos de emergencia activos",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "Lista" } }
+      },
+      "post": {
+        "tags": ["Contactos"],
+        "summary": "Agregar contacto de emergencia (transacción on-chain)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/NuevoContacto" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Hash de transacción",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "receipt": { "type": "string" } }
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/contactos/{indice}/desactivar": {
+      "post": {
+        "tags": ["Contactos"],
+        "summary": "Desactivar contacto por índice",
+        "parameters": [
+          {
+            "name": "indice",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 0 }
+          },
+          { "$ref": "#/components/parameters/ContractQuery" }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContractQuery" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Hash tx" } }
+      }
+    },
+    "/api/ficha/actualizar": {
+      "post": {
+        "tags": ["Ficha"],
+        "summary": "Actualizar varios campos (una transacción por campo enviado)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/FichaActualizar" } }
+          }
+        },
+        "responses": { "200": { "description": "Lista de transacciones y opcional notificaciones" } }
+      }
+    },
+    "/api/emergencia/alerta": {
+      "post": {
+        "tags": ["Emergencia"],
+        "summary": "Opcional: registrar lectura on-chain; notificar contactos",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmergenciaAlertaBody" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Notificaciones u omitido" } }
+      }
+    },
+    "/api/mapa-de-emergencias/alerta": {
+      "get": {
+        "tags": ["Mapa"],
+        "summary": "Obtener alerta activa (memoria o cadena)",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "Estado de alerta" } }
+      },
+      "post": {
+        "tags": ["Mapa"],
+        "summary": "Registrar o actualizar alerta en mapa",
+        "security": [{ "MapaApiKey": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/MapaAlertaPost" } }
+          }
+        },
+        "responses": { "200": { "description": "Alerta creada" }, "401": { "description": "Clave mapa" } }
+      },
+      "delete": {
+        "tags": ["Mapa"],
+        "summary": "Limpiar alerta de mapa",
+        "security": [{ "MapaApiKey": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Clave mapa" } }
+      }
+    },
+    "/api/contrato/transferir-propiedad": {
+      "post": {
+        "tags": ["Contrato"],
+        "summary": "Transferir propiedad del contrato (solo owner; on-chain `transferirPropiedad`)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/TransferirPropiedad" } }
+          }
+        },
+        "responses": { "200": { "description": "Hash y nuevo propietario" } }
+      }
+    },
+    "/api/contrato/set-autorizado": {
+      "post": {
+        "tags": ["Contrato"],
+        "summary": "Autorizar o revocar editor (solo owner; on-chain `setAutorizado`)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/SetAutorizado" } }
+          }
+        },
+        "responses": { "200": { "description": "Hash tx" } }
+      }
+    }
+  }
+}

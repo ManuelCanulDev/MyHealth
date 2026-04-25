@@ -22,7 +22,9 @@ ENV PORT=3000
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev
 COPY backend ./backend
-COPY public ./public
+COPY landing ./landing
+COPY INTEGRACION_APP.md ./INTEGRACION_APP.md
+COPY openapi.json ./openapi.json
 COPY --from=builder /app/out ./out
 COPY --from=builder /app/contracts ./contracts
 
