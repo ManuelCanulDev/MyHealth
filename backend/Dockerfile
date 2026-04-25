@@ -16,6 +16,9 @@ RUN forge build
 
 # Imagen de ejecución
 FROM node:20-bookworm-slim
+# `npm install` puede invocar `git` (dependencias o metadatos); slim no trae git → ENOENT / "unknown git error".
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
