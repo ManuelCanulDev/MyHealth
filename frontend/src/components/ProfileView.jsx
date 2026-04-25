@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, CreditCard, ChevronRight, Bell, Eye, FileText, Activity, Phone, Heart, Hash, Globe, Lock, User, AlertCircle } from 'lucide-react';
+import { ShieldCheck, CreditCard, ChevronRight, Bell, Eye, FileText, Activity, Phone, Heart, Hash, Globe, Lock, User, AlertCircle, ShieldAlert } from 'lucide-react';
 import { getMedicalRecord } from '../api';
 
 const ProfileView = ({ data, contractAddress }) => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Droplet, ShieldAlert, CheckCircle, ArrowRight, ArrowLeft, Cpu, Heart, Phone, Lock, FileText, Edit2 } from 'lucide-react';
+import { User, Droplet, ShieldAlert, CheckCircle, ArrowRight, ArrowLeft, Cpu, Heart, Phone, Lock, FileText, Edit2, ShieldCheck } from 'lucide-react';
 
 const RegisterForm = ({ onComplete }) => {
   const [step, setStep] = useState(1);
