@@ -25,14 +25,14 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-mihealth-blue selection:text-white pb-24">
+    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-myhealth-blue selection:text-white pb-24">
       <header className="p-6 flex justify-between items-center bg-white/90 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-100">
         <button onClick={() => setActiveTab('home')} className="flex items-center gap-2">
-          <div className="bg-mihealth-red p-1.5 rounded-lg shadow-lg shadow-red-200">
+          <div className="bg-myhealth-red p-1.5 rounded-lg shadow-lg shadow-red-200">
             <Activity className="text-white" size={20} />
           </div>
           <h1 className="text-xl font-black tracking-tighter italic">
-            MI<span className="text-mihealth-red">HEALTH</span>
+            MY<span className="text-myhealth-red">HEALTH</span>
           </h1>
         </button>
         
@@ -54,7 +54,7 @@ function App() {
           <div className="p-6 space-y-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="text-center space-y-2">
               <h2 className="text-3xl font-black leading-none tracking-tight uppercase italic text-slate-800">
-                Modo <span className="text-mihealth-red">Rescate</span>
+                Modo <span className="text-myhealth-red">Rescate</span>
               </h2>
               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest italic">
                 Uso exclusivo para personal médico
@@ -73,11 +73,11 @@ function App() {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-black uppercase italic tracking-tighter">Sin Perfil Activo</h3>
-                  <p className="text-slate-500 text-sm font-medium px-8 leading-relaxed">No has vinculado un brazalete MiHealth todavía.</p>
+                  <p className="text-slate-500 text-sm font-medium px-8 leading-relaxed">No has vinculado un brazalete MyHealth todavía.</p>
                 </div>
                 <button 
                   onClick={() => setActiveTab('register')}
-                  className="bg-mihealth-blue text-white px-8 py-4 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-transform"
+                  className="bg-myhealth-blue text-white px-8 py-4 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-transform"
                 >
                   Obtener mi Pasaporte
                 </button>
@@ -102,22 +102,22 @@ function App() {
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
-        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-mihealth-red scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Home size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Inicio</span>
         </button>
 
-        <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'emergency' ? 'text-mihealth-red scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Activity size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Rescate</span>
         </button>
 
-        <button onClick={() => setActiveTab('activity')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'activity' ? 'text-mihealth-blue scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => setActiveTab('activity')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'activity' ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
           <History size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Bitácora</span>
         </button>
 
-        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-all ${['profile', 'register'].includes(activeTab) ? 'text-mihealth-blue scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-all ${['profile', 'register'].includes(activeTab) ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
           <User size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Perfil</span>
         </button>

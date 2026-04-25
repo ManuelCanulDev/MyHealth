@@ -30,15 +30,15 @@ const RegisterForm = ({ onComplete }) => {
     onComplete();
   };
 
-  const inputStyle = "w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-mihealth-blue outline-none transition-all font-medium text-slate-700 bg-white shadow-sm text-sm";
+  const inputStyle = "w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-myhealth-blue outline-none transition-all font-medium text-slate-700 bg-white shadow-sm text-sm";
   const labelStyle = "text-[10px] font-black uppercase text-slate-400 ml-4 mb-1 block tracking-widest";
 
   if (isMinting) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-6 text-center animate-in fade-in duration-500">
         <div className="relative">
-          <Cpu size={80} className="text-mihealth-blue animate-spin duration-[3000ms]" />
-          <div className="absolute inset-0 border-4 border-mihealth-blue rounded-full animate-ping opacity-20"></div>
+          <Cpu size={80} className="text-myhealth-blue animate-spin duration-[3000ms]" />
+          <div className="absolute inset-0 border-4 border-myhealth-blue rounded-full animate-ping opacity-20"></div>
         </div>
         <div className="space-y-2">
           <h3 className="text-2xl font-black italic tracking-tighter uppercase">Cifrando Datos</h3>
@@ -53,7 +53,7 @@ const RegisterForm = ({ onComplete }) => {
       {/* Progreso */}
       <div className="flex gap-2 mb-8">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${step >= i ? 'bg-mihealth-blue' : 'bg-slate-100'}`}></div>
+          <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${step >= i ? 'bg-myhealth-blue' : 'bg-slate-100'}`}></div>
         ))}
       </div>
 
@@ -177,7 +177,7 @@ const RegisterForm = ({ onComplete }) => {
           <div className="bg-slate-50 p-5 rounded-3xl text-left border border-slate-100">
             <div className="flex justify-between items-center mb-3">
               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Resumen del Perfil</span>
-              <Heart size={14} className="text-mihealth-red fill-mihealth-red" />
+              <Heart size={14} className="text-myhealth-red fill-myhealth-red" />
             </div>
             <p className="text-xl font-black text-slate-800 leading-tight uppercase italic">{formData.name}</p>
             <div className="flex gap-2 mt-2">
@@ -186,7 +186,7 @@ const RegisterForm = ({ onComplete }) => {
             </div>
           </div>
 
-          <button onClick={handleFinish} className="w-full bg-mihealth-blue text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-all">
+          <button onClick={handleFinish} className="w-full bg-myhealth-blue text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-all">
             VINCULAR BRAZALETE
           </button>
           

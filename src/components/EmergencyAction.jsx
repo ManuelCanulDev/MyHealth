@@ -63,18 +63,18 @@ const EmergencyAction = () => {
   };
 
   if (step === 'idle') return (
-    <button onClick={handleStartScan} className="w-full bg-mihealth-red text-white py-12 rounded-[40px] shadow-2xl shadow-red-200 flex flex-col items-center gap-4 active:scale-95 transition-all">
+    <button onClick={handleStartScan} className="w-full bg-myhealth-red text-white py-12 rounded-[40px] shadow-2xl shadow-red-200 flex flex-col items-center gap-4 active:scale-95 transition-all">
       <Cpu size={56} className="animate-pulse" />
       <span className="text-2xl font-black italic tracking-tighter uppercase leading-none">Escanear Brazalete NFC</span>
     </button>
   );
 
   if (step === 'scanning' || step === 'loading') return (
-    <div className="w-full bg-slate-50 p-12 rounded-[40px] border-2 border-mihealth-blue overflow-hidden relative flex flex-col items-center gap-8 shadow-xl">
+    <div className="w-full bg-slate-50 p-12 rounded-[40px] border-2 border-myhealth-blue overflow-hidden relative flex flex-col items-center gap-8 shadow-xl">
       <div className="relative w-32 h-32 flex items-center justify-center">
-        <div className="absolute inset-0 border-2 border-mihealth-blue rounded-full animate-ping opacity-20"></div>
-        <div className="absolute inset-0 border-t-4 border-mihealth-blue rounded-full animate-spin"></div>
-        <Cpu size={48} className="text-mihealth-blue relative z-10" />
+        <div className="absolute inset-0 border-2 border-myhealth-blue rounded-full animate-ping opacity-20"></div>
+        <div className="absolute inset-0 border-t-4 border-myhealth-blue rounded-full animate-spin"></div>
+        <Cpu size={48} className="text-myhealth-blue relative z-10" />
       </div>
       <p className="text-xl font-black italic uppercase tracking-tighter text-center text-slate-800">
         {step === 'scanning' ? 'Buscando NFC...' : 'Validando Monad...'}
@@ -86,7 +86,7 @@ const EmergencyAction = () => {
     <div className="w-full space-y-6 animate-in slide-in-from-bottom-8 duration-500 pb-10">
       {/* FICHA VITAL HOMOGÉNEA */}
       <div className="bg-white rounded-[40px] shadow-2xl overflow-hidden border border-slate-100">
-        <div className="bg-mihealth-red p-4 text-white flex justify-between items-center">
+        <div className="bg-myhealth-red p-4 text-white flex justify-between items-center">
           <div className="flex items-center gap-2">
             <AlertCircle size={16} />
             <span className="font-black italic tracking-widest text-[10px]">FICHA MÉDICA DE EMERGENCIA</span>
@@ -121,7 +121,7 @@ const EmergencyAction = () => {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                <Droplet size={10} className="text-mihealth-red" /> Sangre
+                <Droplet size={10} className="text-myhealth-red" /> Sangre
               </p>
               <p className="text-3xl font-black text-slate-800 leading-none">{basicData?.bloodType}</p>
             </div>
@@ -151,7 +151,7 @@ const EmergencyAction = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-slate-500 uppercase">Medicación:</span>
-                <span className="text-xs font-black text-mihealth-blue text-right leading-tight max-w-[150px]">{basicData?.baseMedication}</span>
+                <span className="text-xs font-black text-myhealth-blue text-right leading-tight max-w-[150px]">{basicData?.baseMedication}</span>
               </div>
             </div>
           </div>
@@ -162,7 +162,7 @@ const EmergencyAction = () => {
             {basicData?.contacts.map((contact, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-white rounded-3xl border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 bg-mihealth-blue/10 rounded-full flex items-center justify-center text-mihealth-blue">
+                   <div className="w-10 h-10 bg-myhealth-blue/10 rounded-full flex items-center justify-center text-myhealth-blue">
                      <Phone size={18} />
                    </div>
                    <div>
@@ -170,7 +170,7 @@ const EmergencyAction = () => {
                      <p className="text-[11px] font-bold text-slate-400">{contact.phone}</p>
                    </div>
                 </div>
-                <a href={`tel:${contact.phone}`} className="bg-mihealth-blue text-white p-3 rounded-2xl shadow-lg active:scale-90 transition-transform">
+                <a href={`tel:${contact.phone}`} className="bg-myhealth-blue text-white p-3 rounded-2xl shadow-lg active:scale-90 transition-transform">
                   <Phone size={16} />
                 </a>
               </div>
@@ -191,7 +191,7 @@ const EmergencyAction = () => {
               <input 
                 type="password" 
                 placeholder="Introducir PIN" 
-                className="w-full p-5 rounded-[24px] border-2 border-slate-100 outline-none font-bold text-center text-lg bg-white shadow-sm focus:border-mihealth-blue transition-all"
+                className="w-full p-5 rounded-[24px] border-2 border-slate-100 outline-none font-bold text-center text-lg bg-white shadow-sm focus:border-myhealth-blue transition-all"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
               />

@@ -11,12 +11,12 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
           <div className="rounded-[40px] overflow-hidden border-8 border-white shadow-2xl rotate-2 aspect-[4/5] bg-slate-200">
             <img 
               src="/assets/hero-senior.png" 
-              alt="Adulto mayor seguro con MiHealth" 
+              alt="Adulto mayor seguro con MyHealth" 
               className="w-full h-full object-cover"
               onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?auto=format&fit=crop&q=80&w=400"; }} // Fallback por si no has subido la imagen
             />
           </div>
-          <div className="absolute -bottom-4 -right-4 bg-mihealth-red text-white p-4 rounded-3xl shadow-xl -rotate-3">
+          <div className="absolute -bottom-4 -right-4 bg-myhealth-red text-white p-4 rounded-3xl shadow-xl -rotate-3">
             <Heart className="fill-white" size={24} />
           </div>
         </div>
@@ -24,7 +24,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-black leading-none tracking-tight text-slate-800">
             TRANQUILIDAD <br />
-            <span className="text-mihealth-blue italic">PARA TU FAMILIA</span>
+            <span className="text-myhealth-blue italic">PARA TU FAMILIA</span>
           </h1>
           
           <p className="text-slate-600 text-base font-medium leading-relaxed px-2">
@@ -34,7 +34,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
           <div className="flex flex-col gap-4 pt-6">
             <button 
               onClick={onStartRegister}
-              className="bg-mihealth-blue text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 active:scale-95 transition-transform text-lg"
+              className="bg-myhealth-blue text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 active:scale-95 transition-transform text-lg"
             >
               Crear mi Pasaporte
             </button>
@@ -60,7 +60,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
         </div>
 
         <div className="flex items-start gap-5">
-          <div className="bg-red-100 p-4 rounded-2xl text-mihealth-red shrink-0">
+          <div className="bg-red-100 p-4 rounded-2xl text-myhealth-red shrink-0">
             <Activity size={28} />
           </div>
           <div className="space-y-1">
@@ -82,7 +82,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
         </h2>
         <button 
           onClick={onStartEmergency}
-          className="bg-mihealth-red text-white px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest relative z-10"
+          className="bg-myhealth-red text-white px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest relative z-10"
         >
           Escanear Paciente
         </button>

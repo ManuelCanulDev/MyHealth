@@ -25,7 +25,7 @@ const ActivityView = () => {
       id: 3,
       event: "Vinculación de Dispositivo",
       location: "App Móvil",
-      actor: "Sistema MiHealth",
+      actor: "Sistema MyHealth",
       time: "22 Abr, 09:00 AM",
       status: "Exitoso",
       txHash: "0x9e5f...1d8e"
@@ -44,7 +44,7 @@ const ActivityView = () => {
           <div key={log.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${log.event.includes('Emergencia') ? 'bg-red-50 text-mihealth-red' : 'bg-blue-50 text-mihealth-blue'}`}>
+                <div className={`p-2 rounded-xl ${log.event.includes('Emergencia') ? 'bg-red-50 text-myhealth-red' : 'bg-blue-50 text-myhealth-blue'}`}>
                   <Shield size={20} />
                 </div>
                 <div>
@@ -64,7 +64,7 @@ const ActivityView = () => {
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-[11px] text-slate-400 font-medium italic italic">Por: {log.actor}</p>
-                <div className="flex items-center gap-1 text-mihealth-blue">
+                <div className="flex items-center gap-1 text-myhealth-blue">
                   <span className="text-[9px] font-mono">{log.txHash}</span>
                   <ExternalLink size={10} />
                 </div>

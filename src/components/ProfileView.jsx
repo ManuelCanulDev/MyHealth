@@ -29,7 +29,7 @@ const ProfileView = () => {
               onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200"; }}
             />
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-mihealth-blue border-2 border-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm">
+          <div className="absolute -bottom-1 -right-1 bg-myhealth-blue border-2 border-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm">
             <ShieldCheck size={14} className="text-white" />
           </div>
         </div>
@@ -44,12 +44,12 @@ const ProfileView = () => {
       <section className="space-y-4">
         <div className="flex items-center justify-between px-2">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-            <Eye size={14} className="text-mihealth-red" /> Vista de Emergencia (Pública)
+            <Eye size={14} className="text-myhealth-red" /> Vista de Emergencia (Pública)
           </h3>
-          <span className="text-[9px] bg-red-100 text-mihealth-red px-2 py-0.5 rounded-full font-bold">VISIBLE POR RESCATISTAS</span>
+          <span className="text-[9px] bg-red-100 text-myhealth-red px-2 py-0.5 rounded-full font-bold">VISIBLE POR RESCATISTAS</span>
         </div>
 
-        <div className="bg-white rounded-[32px] p-6 shadow-xl border-l-[12px] border-mihealth-red relative overflow-hidden">
+        <div className="bg-white rounded-[32px] p-6 shadow-xl border-l-[12px] border-myhealth-red relative overflow-hidden">
           <div className="absolute top-0 right-0 p-6 opacity-5">
             <Activity size={80} />
           </div>
@@ -58,7 +58,7 @@ const ProfileView = () => {
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-3xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">{userData.name}</h2>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Pasaporte de Salud MiHealth</p>
+                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Pasaporte de Salud MyHealth</p>
               </div>
               <div className="bg-slate-50 p-2 rounded-xl">
                 <CreditCard size={20} className="text-slate-400" />
@@ -68,7 +68,7 @@ const ProfileView = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
                 <p className="text-[9px] font-bold text-slate-400 uppercase">Sangre</p>
-                <p className="text-2xl font-black text-mihealth-red leading-none">{userData.bloodType}</p>
+                <p className="text-2xl font-black text-myhealth-red leading-none">{userData.bloodType}</p>
               </div>
               <div className="bg-red-50 p-3 rounded-2xl border border-red-100">
                 <p className="text-[9px] font-bold text-red-400 uppercase">Alergia</p>
@@ -87,15 +87,15 @@ const ProfileView = () => {
       <section className="space-y-4">
         <div className="flex items-center justify-between px-2">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-            <Lock size={14} className="text-mihealth-blue" /> Bóveda de Salud (Privada)
+            <Lock size={14} className="text-myhealth-blue" /> Bóveda de Salud (Privada)
           </h3>
-          <ShieldCheck size={16} className="text-mihealth-blue" />
+          <ShieldCheck size={16} className="text-myhealth-blue" />
         </div>
 
-        <div className={`bg-slate-900 rounded-[40px] transition-all duration-500 border-2 overflow-hidden ${showVault ? 'border-mihealth-blue shadow-2xl shadow-blue-900/20' : 'border-slate-800'}`}>
+        <div className={`bg-slate-900 rounded-[40px] transition-all duration-500 border-2 overflow-hidden ${showVault ? 'border-myhealth-blue shadow-2xl shadow-blue-900/20' : 'border-slate-800'}`}>
           {!showVault ? (
             <div className="p-8 space-y-6 flex flex-col items-center text-center">
-              <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center text-mihealth-blue border border-white/10">
+              <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center text-myhealth-blue border border-white/10">
                 <Fingerprint size={40} />
               </div>
               <div className="space-y-2">
@@ -106,7 +106,7 @@ const ProfileView = () => {
               </div>
               <button 
                 onClick={() => setShowVault(true)}
-                className="w-full bg-mihealth-blue hover:bg-blue-600 text-white py-5 rounded-[24px] font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-blue-900/40 active:scale-95"
+                className="w-full bg-myhealth-blue hover:bg-blue-600 text-white py-5 rounded-[24px] font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-blue-900/40 active:scale-95"
               >
                 Desbloquear Información
               </button>
@@ -116,8 +116,8 @@ const ProfileView = () => {
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-mihealth-blue/20 rounded-xl">
-                      <Unlock size={18} className="text-mihealth-blue" />
+                    <div className="p-2 bg-myhealth-blue/20 rounded-xl">
+                      <Unlock size={18} className="text-myhealth-blue" />
                     </div>
                     <span className="text-white font-black text-sm uppercase tracking-widest leading-none">Acceso Autorizado</span>
                   </div>
@@ -164,11 +164,11 @@ const ProfileView = () => {
       {/* SECCIÓN 3: RED DE APOYO */}
       <section className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-          <Bell size={14} className="text-mihealth-red" /> Contactos SOS
+          <Bell size={14} className="text-myhealth-red" /> Contactos SOS
         </h3>
         <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-mihealth-red/10 rounded-full flex items-center justify-center text-mihealth-red text-xs font-black">MG</div>
+            <div className="w-10 h-10 bg-myhealth-red/10 rounded-full flex items-center justify-center text-myhealth-red text-xs font-black">MG</div>
             <div>
               <p className="text-sm font-bold text-slate-800 leading-tight">María García</p>
               <p className="text-[10px] text-slate-400 font-medium">Esposa • SMS Activo</p>
