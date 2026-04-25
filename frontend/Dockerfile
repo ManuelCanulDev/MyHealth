@@ -1,7 +1,8 @@
 # MyHealth frontend (Vite + React) — build estático y Nginx para Coolify
 # En Coolify: Base Directory = `frontend`, puerto del contenedor = 80 (solo interno; no mapear 80 del host).
 #
-# URL del backend: variable de entorno VITE_API_URL en el servicio (runtime).
+# URL del backend (runtime en Coolify: activar "Runtime" en la variable):
+# VITE_API_URL | VITE_API_BASE_URL | MYHEALTH_API_URL | API_BASE_URL
 # docker-entrypoint.sh genera /config.js al arrancar; no hace falta Build Argument.
 
 FROM node:20-bookworm-slim AS builder
@@ -27,7 +28,6 @@ RUN chmod +x /docker-entrypoint.sh
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
-ENV VITE_API_URL=
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://127.0.0.1/ >/dev/null || exit 1

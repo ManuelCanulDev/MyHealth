@@ -1,18 +1,36 @@
-function getApiBaseUrl() {
-  if (typeof window !== "undefined" && window.__ENV__ && window.__ENV__.VITE_API_URL) {
-    return window.__ENV__.VITE_API_URL;
+function firstNonEmptyString(...candidates) {
+  for (const v of candidates) {
+    if (typeof v === "string" && v.trim() !== "") return v.trim();
   }
-  return import.meta.env.VITE_API_URL || "http://localhost:3000";
+  return null;
 }
 
-const API_BASE_URL = getApiBaseUrl();
+function getApiBaseUrl() {
+  if (typeof window !== "undefined" && window.__ENV__) {
+    const env = window.__ENV__;
+    const fromRuntime = firstNonEmptyString(
+      env.VITE_API_URL,
+      env.VITE_API_BASE_URL,
+      env.MYHEALTH_API_URL,
+      env.API_BASE_URL,
+    );
+    if (fromRuntime) return fromRuntime;
+  }
+  const fromBuild = firstNonEmptyString(
+    import.meta.env.VITE_API_URL,
+    import.meta.env.VITE_API_BASE_URL,
+    import.meta.env.MYHEALTH_API_URL,
+  );
+  if (fromBuild) return fromBuild;
+  return "http://localhost:3000";
+}
 
 /**
  * Obtiene la ficha médica de un contrato específico.
  * @param {string} contractAddress 
  */
 export const getMedicalRecord = async (contractAddress) => {
-  const response = await fetch(`${API_BASE_URL}/api/ficha?contract=${contractAddress}`);
+  const response = await fetch(`${getApiBaseUrl()}/api/ficha?contract=${contractAddress}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Error al obtener la ficha médica');
@@ -26,7 +44,7 @@ export const getMedicalRecord = async (contractAddress) => {
  * @param {Object} data 
  */
 export const updateMedicalRecord = async (contractAddress, data) => {
-  const response = await fetch(`${API_BASE_URL}/api/ficha/actualizar`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/ficha/actualizar`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -50,7 +68,7 @@ export const updateMedicalRecord = async (contractAddress, data) => {
  * @param {string} details 
  */
 export const triggerEmergencyAlert = async (contractAddress, location, details) => {
-  const response = await fetch(`${API_BASE_URL}/api/emergencia/alerta`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/emergencia/alerta`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
