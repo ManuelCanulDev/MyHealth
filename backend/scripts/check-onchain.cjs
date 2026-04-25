@@ -5,7 +5,10 @@
 /* eslint-disable no-console */
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+require("dotenv").config({
+  path: path.join(__dirname, "..", ".env"),
+  override: true,
+});
 const Web3 = require("web3");
 
 const root = path.join(__dirname, "..");
@@ -27,17 +30,31 @@ const { abi } = JSON.parse(fs.readFileSync(foundry, "utf8"));
 const w3 = new Web3(new Web3.providers.HttpProvider(rpc));
 const c = new w3.eth.Contract(abi, at);
 
-c.methods
-  .perfilNombre()
-  .call()
+function fail(msg, detail) {
+  console.error("check-onchain: FALLO —", msg);
+  console.error("  Dirección en MYHEALTH_CONTRACT_ADDRESS:", at);
+  if (detail) console.error("  ", detail);
+  console.error(
+    "  MYHEALTH_CONTRACT_ADDRESS debe ser la dirección del contrato (contractAddress en broadcast/.../run-latest.json), no la wallet que despliega (from)."
+  );
+  console.error("  Pasos: npm run forge:build && npm run forge:deploy:monad y copiar la dirección del contrato al .env");
+  process.exit(1);
+}
+
+w3.eth
+  .getCode(at)
+  .then(function (code) {
+    if (!code || code === "0x") {
+      fail(
+        "no hay bytecode en esa dirección (¿pusiste la cuenta desplegadora en vez del contrato?)."
+      );
+    }
+    return c.methods.perfilNombre().call();
+  })
   .then(function () {
     console.log("check-onchain: OK — contrato con perfil on-chain", at);
     process.exit(0);
   })
   .catch(function (e) {
-    console.error("check-onchain: FALLO — el contrato no acepta perfilNombre (¿despliegue antiguo?).");
-    console.error("  Dirección:", at);
-    console.error("  ", e && e.message ? e.message : e);
-    console.error("  Asegúrate: npm run forge:build && npm run forge:deploy:monad y actualizar .env");
-    process.exit(1);
+    fail("el contrato no acepta perfilNombre (¿despliegue antiguo o ABI distinto?).", e && e.message ? e.message : e);
   });

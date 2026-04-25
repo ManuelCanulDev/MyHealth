@@ -1,12 +1,12 @@
 # MyHealth API (Node + artefacto Foundry para el ABI)
 FROM node:20-bookworm-slim AS builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates \
+RUN apt-get update && apt-get install -y --no-install-recommends bash git curl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Foundry: compilar el contrato y dejar out/MyHealth.sol/MyHealth.json
+# Foundry: el instalador usa `set -o pipefail` (bash); `| sh` usa dash y falla.
 ENV PATH="/root/.foundry/bin:${PATH}"
-RUN curl -L https://foundry.paradigm.xyz | sh && /root/.foundry/bin/foundryup
+RUN curl -L https://foundry.paradigm.xyz | bash && /root/.foundry/bin/foundryup
 WORKDIR /app
 COPY foundry.toml ./
 COPY contracts ./contracts
@@ -16,13 +16,19 @@ RUN forge build
 
 # Imagen de ejecución
 FROM node:20-bookworm-slim
+# `npm install` puede invocar `git` (dependencias o metadatos); slim no trae git → ENOENT / "unknown git error".
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+# Sin package-lock aquí: el lock generado en macOS arrastra fsevents (darwin) y `npm ci` falla en Linux.
+COPY package.json ./
+RUN npm install --omit=dev --no-audit --no-fund
 COPY backend ./backend
-COPY public ./public
+COPY landing ./landing
+COPY INTEGRACION_APP.md ./INTEGRACION_APP.md
+COPY openapi.json ./openapi.json
 COPY --from=builder /app/out ./out
 COPY --from=builder /app/contracts ./contracts
 

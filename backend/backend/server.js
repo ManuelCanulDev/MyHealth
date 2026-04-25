@@ -2,12 +2,16 @@
  * API REST MyHealth: lectura de datos on-chain, escritura firmada,
  * y alertas opcionales a contactos (tras cambio de datos o lectura de emergencia).
  */
-require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
+require("dotenv").config({
+  path: require("path").join(__dirname, "..", ".env"),
+  override: true,
+});
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const Web3 = require("web3");
+const swaggerUi = require("swagger-ui-express");
 const { notificarContactos } = require("./notify");
 
 const PORT = process.env.PORT || 3000;
@@ -20,7 +24,34 @@ if (PRIVATE_KEY && !PRIVATE_KEY.startsWith("0x")) {
 }
 
 const app = express();
-const publicDir = path.join(__dirname, "..", "public");
+const OPENAPI_TEMPLATE_PATH = path.join(__dirname, "..", "openapi.json");
+const INTEGRACION_MD = path.join(__dirname, "..", "INTEGRACION_APP.md");
+const LANDING_DIR = path.join(__dirname, "..", "landing");
+const SPLASH_HTML = path.join(LANDING_DIR, "splash.html");
+let OPENAPI_BASE;
+try {
+  OPENAPI_BASE = JSON.parse(fs.readFileSync(OPENAPI_TEMPLATE_PATH, "utf8"));
+} catch (e) {
+  OPENAPI_BASE = null;
+  console.warn("No se pudo cargar openapi.json:", e.message);
+}
+
+function buildOpenApiSpec(req) {
+  const spec = OPENAPI_BASE
+    ? JSON.parse(JSON.stringify(OPENAPI_BASE))
+    : {
+        openapi: "3.0.3",
+        info: { title: "MyHealth API", version: "1.0.0" },
+        paths: {},
+      };
+  const proto = req.get("x-forwarded-proto") || req.protocol;
+  const host = req.get("x-forwarded-host") || req.get("host");
+  if (host) {
+    spec.servers = [{ url: `${proto}://${host}`, description: "Este despliegue" }];
+  }
+  return spec;
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -70,6 +101,35 @@ function normalizarFilaMapaOnchain(row) {
         : new Date(0).toISOString(),
   };
 }
+
+app.get("/landing/myhealth_logo.png", (_req, res) => {
+  const png = path.join(LANDING_DIR, "myhealth_logo.png");
+  if (!fs.existsSync(png)) {
+    return res.status(404).type("text/plain").send("Logo no encontrado.");
+  }
+  res.sendFile(png);
+});
+
+app.get("/", (_req, res) => {
+  if (!fs.existsSync(SPLASH_HTML)) {
+    return res.status(503).type("text/plain").send("Página de inicio no disponible.");
+  }
+  const frontendUrl = (
+    process.env.MYHEALTH_FRONTEND_URL ||
+    process.env.FRONTEND_URL ||
+    "http://127.0.0.1:8080"
+  ).trim();
+  let html = fs.readFileSync(SPLASH_HTML, "utf8");
+  html = html.replace(/\{\{FRONTEND_URL\}\}/g, frontendUrl);
+  res.type("text/html; charset=utf-8").send(html);
+});
+
+app.get("/INTEGRACION_APP.md", (req, res) => {
+  if (!fs.existsSync(INTEGRACION_MD)) {
+    return res.status(404).type("text/plain").send("Guía no encontrada.");
+  }
+  res.type("text/markdown; charset=utf-8").sendFile(INTEGRACION_MD);
+});
 
 /** Mapa: rutas al inicio para que nunca queden ocultas por otra capa */
 app.get("/api/mapa-de-emergencias/alerta", async (req, res) => {
@@ -409,6 +469,24 @@ async function asegurarPuedeEditarFicha(contract, firmante) {
   );
 }
 
+/** Solo el owner (no basta con estar autorizado para editar). */
+async function asegurarEsPropietario(contract, firmante) {
+  let own;
+  try {
+    own = await contract.methods.owner().call();
+  } catch (e) {
+    throw new Error(
+      `No se pudo leer owner() en el contrato. Revisa MYHEALTH_CONTRACT_ADDRESS y MONAD_RPC. ${e.message || ""}`.trim()
+    );
+  }
+  const s = Web3.utils.toChecksumAddress(firmante);
+  if (s !== Web3.utils.toChecksumAddress(own)) {
+    throw new Error(
+      `Solo el propietario del contrato puede ejecutar esta acción. Owner: ${own}. Firmante del servidor: ${s}.`
+    );
+  }
+}
+
 function enriquecerErrorEvm(e) {
   let m = (e && e.message) || String(e);
   if (e && e.reason) m += " — " + String(e.reason);
@@ -486,7 +564,11 @@ app.get("/api", (_req, res) => {
   res.json({
     nombre: "MyHealth API",
     version: 1,
-    documentacion: "/openapi.json",
+    documentacion: {
+      swaggerUi: "/docs",
+      openApiJson: "/openapi.json",
+    },
+    paginaInicio: "/",
     guia: "/INTEGRACION_APP.md",
     red: {
       chainId: 10143,
@@ -496,9 +578,24 @@ app.get("/api", (_req, res) => {
     },
     contratoDefault: CONTRACT_ADDRESS || null,
     nota:
-      "Prototipo: una ficha por el contrato en MYHEALTH_CONTRACT_ADDRESS (un titular). GET /api/ficha?contract=0x... (o sin query con .env). En productivo, un despliegue por paciente. Escritura: CUENTA = owner del contrato indicado.",
+      "Prototipo: una ficha por el contrato en MYHEALTH_CONTRACT_ADDRESS (un titular). GET /api/ficha?contract=0x... (o sin query con .env). En productivo, un despliegue por paciente. Escritura: CUENTA = owner del contrato indicado (o cuenta autorizada con setAutorizado).",
   });
 });
+
+app.get("/openapi.json", (req, res) => {
+  res.json(buildOpenApiSpec(req));
+});
+
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  (req, res, next) => {
+    swaggerUi.setup(buildOpenApiSpec(req), {
+      customSiteTitle: "MyHealth API — Swagger",
+      customCss: ".swagger-ui .topbar { display: none }",
+    })(req, res, next);
+  }
+);
 
 /** Lectura pública de la ficha (mismo callejero que en cadena) */
 app.get("/api/datos", async (req, res) => {
@@ -783,17 +880,60 @@ app.post("/api/emergencia/alerta", async (req, res) => {
   }
 });
 
-/** Front: después de toda la API (evita que static intercepte /api/*) */
-app.get("/mapa-de-emergencias", (_req, res) => {
-  res.sendFile(path.join(publicDir, "mapa-de-emergencias.html"));
+app.post("/api/contrato/transferir-propiedad", async (req, res) => {
+  try {
+    const { web3, contract, address: at } = getBundleForRequest(req);
+    await asegurarDireccionConCodigo(web3, at);
+    const firmante = getFirmanteServidorOrThrow(web3);
+    await asegurarEsPropietario(contract, firmante);
+    const nuevo = normalizeAddress(req.body && req.body.nuevo);
+    if (!nuevo) {
+      return res.status(400).json({ error: "Incluya nuevo: dirección 0x del nuevo propietario" });
+    }
+    const receipt = await enviarTransaccion(web3, contract.methods.transferirPropiedad(nuevo), at);
+    res.json({
+      receipt: receipt?.transactionHash,
+      nuevoPropietario: nuevo,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+
+app.post("/api/contrato/set-autorizado", async (req, res) => {
+  try {
+    const { web3, contract, address: at } = getBundleForRequest(req);
+    await asegurarDireccionConCodigo(web3, at);
+    const firmante = getFirmanteServidorOrThrow(web3);
+    await asegurarEsPropietario(contract, firmante);
+    const cuenta = normalizeAddress(req.body && req.body.cuenta);
+    if (!cuenta) {
+      return res.status(400).json({ error: "Incluya cuenta: dirección 0x" });
+    }
+    if (req.body == null || req.body.permitido === undefined) {
+      return res.status(400).json({ error: "Incluya permitido: true o false" });
+    }
+    const permitido =
+      req.body.permitido === true || req.body.permitido === "true" || req.body.permitido === 1;
+    const receipt = await enviarTransaccion(
+      web3,
+      contract.methods.setAutorizado(cuenta, permitido),
+      at
+    );
+    res.json({
+      receipt: receipt?.transactionHash,
+      cuenta,
+      permitido,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
-app.use(express.static(publicDir));
 
 app.listen(PORT, () => {
   console.log(`MyHealth API en http://localhost:${PORT}`);
+  console.log(`  Swagger UI: http://localhost:${PORT}/docs`);
+  console.log(`  OpenAPI JSON: http://localhost:${PORT}/openapi.json`);
   if (CONTRACT_ADDRESS) {
     try {
       console.log(
