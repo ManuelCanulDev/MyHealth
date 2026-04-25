@@ -6,7 +6,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
     <div className="bg-white text-slate-900 animate-in fade-in duration-700">
       {/* Hero Section para Adultos Mayores */}
       <section className="px-6 pt-10 pb-12 bg-gradient-to-b from-blue-50 to-white overflow-hidden">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div className="w-full grid md:grid-cols-2 gap-12 items-center">
           <div className="max-w-xs md:max-w-md mx-auto mb-8 md:mb-0 relative order-1 md:order-2">
             {/* Contenedor de Imagen con estilo amigable */}
             <div className="rounded-[40px] overflow-hidden border-8 border-white shadow-2xl rotate-2 aspect-[4/5] bg-slate-200">
@@ -54,7 +54,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
       </section>
 
       {/* Sección de Confianza - Lenguaje Sencillo */}
-      <section className="px-8 py-16 max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+      <section className="px-8 py-16 w-full grid md:grid-cols-2 gap-12">
         <div className="flex items-start gap-5">
           <div className="bg-amber-100 p-4 rounded-2xl text-amber-600 shrink-0">
             <ShieldCheck size={28} />
@@ -81,7 +81,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
       </section>
 
       {/* Banner de Ayuda Directa */}
-      <section className="mx-6 md:mx-auto max-w-6xl mb-20 p-8 md:p-16 bg-slate-900 rounded-[40px] text-white text-center md:text-left space-y-6 relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between">
+      <section className="mx-6 mb-20 p-8 md:p-16 bg-slate-900 rounded-[40px] text-white text-center md:text-left space-y-6 relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="absolute top-0 right-0 opacity-10 -rotate-12 translate-x-1/4 -translate-y-1/4">
           <Globe size={300} />
         </div>

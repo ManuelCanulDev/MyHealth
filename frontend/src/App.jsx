@@ -44,7 +44,7 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto min-h-[calc(100-160px)]">
+      <main className="max-w-7xl mx-auto min-h-[calc(100-160px)] px-4 md:px-8">
         {activeTab === 'home' && (
           <LandingPage 
             onStartEmergency={() => setActiveTab('emergency')} 
@@ -53,7 +53,7 @@ function App() {
         )}
 
         {activeTab === 'emergency' && (
-          <div className="p-6 space-y-8 animate-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
+          <div className="p-6 space-y-8 animate-in slide-in-from-bottom-4 duration-500 w-full">
             <div className="text-center space-y-2">
               <h2 className="text-3xl font-black leading-none tracking-tight uppercase italic text-slate-800">
                 Modo <span className="text-myhealth-red">Rescate</span>

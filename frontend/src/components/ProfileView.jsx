@@ -113,54 +113,56 @@ const ProfileView = ({ data }) => {
             </div>
             
             <div className="relative z-10 space-y-8">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Grupo Sanguíneo</p>
-                  <p className="text-4xl font-black text-myhealth-red leading-none">{userData.bloodType}</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 flex flex-col justify-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Grupo Sanguíneo</p>
+                  <p className="text-4xl md:text-5xl font-black text-myhealth-red leading-none">{userData.bloodType}</p>
                 </div>
-                <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Donador Org.</p>
-                  <p className={`text-xl font-black leading-none ${userData.isDonor ? 'text-green-600' : 'text-slate-400'}`}>
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 flex flex-col justify-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Donador Org.</p>
+                  <p className={`text-xl md:text-2xl font-black leading-none ${userData.isDonor ? 'text-green-600' : 'text-slate-400'}`}>
                     {userData.isDonor ? 'SÍ, ACTIVO' : 'NO'}
                   </p>
                 </div>
-                <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 md:col-span-1 col-span-2">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Creencias / Religión</p>
-                  <p className="text-lg font-black text-slate-800 leading-none">{userData.religion}</p>
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 md:col-span-1 col-span-2 flex flex-col justify-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Creencias / Religión</p>
+                  <p className="text-lg md:text-xl font-black text-slate-800 leading-none">{userData.religion}</p>
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-6 md:gap-8 pt-4">
+                <div className="space-y-6">
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
                       <ShieldAlert size={12} className="text-myhealth-red" /> Alergias Críticas
                     </p>
-                    <div className="bg-red-50 p-5 rounded-3xl border border-red-100">
-                      <p className="text-sm font-black text-red-600 uppercase leading-relaxed">{userData.allergies}</p>
+                    <div className="bg-red-50 p-6 rounded-[32px] border border-red-100">
+                      <p className="text-sm md:text-base font-black text-red-600 uppercase leading-relaxed">{userData.allergies}</p>
                     </div>
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
                       <Activity size={12} className="text-myhealth-blue" /> Enfermedades
                     </p>
-                    <div className="bg-blue-50 p-5 rounded-3xl border border-blue-100">
-                      <p className="text-sm font-black text-myhealth-blue uppercase italic">{userData.chronicDisease}</p>
+                    <div className="bg-blue-50 p-6 rounded-[32px] border border-blue-100">
+                      <p className="text-sm md:text-base font-black text-myhealth-blue uppercase italic">{userData.chronicDisease}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
+                <div className="space-y-6">
+                  <div className="h-full flex flex-col">
                     <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
                       <FileText size={12} /> Historial & Medicación
                     </p>
-                    <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 min-h-[160px]">
-                      <p className="text-xs font-bold text-slate-500 uppercase mb-2">Notas Médicas:</p>
-                      <p className="text-sm font-semibold text-slate-700 leading-relaxed">{userData.history}</p>
-                      <div className="mt-4 pt-4 border-t border-slate-200">
-                        <p className="text-[10px] font-black text-myhealth-blue uppercase">Base:</p>
-                        <p className="text-xs font-bold text-slate-800">{userData.baseMedication}</p>
+                    <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 flex-1 flex flex-col justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase mb-3">Notas Médicas:</p>
+                        <p className="text-sm md:text-base font-semibold text-slate-700 leading-relaxed">{userData.history}</p>
+                      </div>
+                      <div className="mt-6 pt-6 border-t border-slate-200">
+                        <p className="text-[10px] font-black text-myhealth-blue uppercase mb-1">Medicamento Base:</p>
+                        <p className="text-sm font-bold text-slate-800">{userData.baseMedication}</p>
                       </div>
                     </div>
                   </div>
