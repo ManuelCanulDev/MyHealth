@@ -16,7 +16,7 @@ const EmergencyAction = () => {
   const handleStartScan = (forcedAddress = null) => {
     const contractAddress = forcedAddress || testContract || "nfc_001";
     
-    setStep('scanning');
+    setStep('loading');
     setError(null);
 
     if (navigator.geolocation) {
@@ -28,38 +28,38 @@ const EmergencyAction = () => {
       });
     }
 
-    setTimeout(() => {
-      setStep('loading'); 
-      
-      setTimeout(async () => {
-        try {
-          const data = await getMedicalRecord(contractAddress);
+    setTimeout(async () => {
+      try {
+        const data = await getMedicalRecord(contractAddress);
 
-          // Limpiar valores por defecto "string"
-          const nombre = data.perfilNombre === 'string' ? 'PACIENTE' : (data.perfilNombre || 'PACIENTE');
-          const apellido = data.perfilApellido === 'string' ? '' : (data.perfilApellido || '');
+        // Limpiar valores por defecto "string"
+        const nombre = data.perfilNombre === 'string' ? 'PACIENTE' : (data.perfilNombre || 'PACIENTE');
+        const apellido = data.perfilApellido === 'string' ? '' : (data.perfilApellido || '');
 
-          // Adaptar datos del API al formato del componente
-          const formattedData = {
-            name: `${nombre} ${apellido}`.trim() || "PACIENTE DESCONOCIDO",
-            bloodType: data.tipoSangre === 'string' ? "N/A" : (data.tipoSangre || "N/A"),
-            allergies: data.alergias === 'string' ? "Ninguna registrada" : (data.alergias || "Ninguna registrada"),
-            nss: data.numeroSeguroSocial === 'string' ? "No disponible" : (data.numeroSeguroSocial || "No disponible"),
-            religion: data.religion === 'string' ? "No especificada" : (data.religion || "No especificada"),
-            chronicDisease: data.condiciones === 'string' ? "Ninguna registrada" : (data.condiciones || "Ninguna registrada"),
-            baseMedication: data.medicacion === 'string' ? "Sin medicación" : (data.medicacion || "Sin medicación"),
-            isDonor: data.esDonante === true || data.esDonante === "true",
-            history: data.notaEmergencia === 'string' ? "Sin notas adicionales" : (data.notaEmergencia || "Sin notas adicionales"),
-            contacts: data.contactos || []
-          };
-          setBasicData(formattedData);
-          setStep('success');
-        } catch (e) {
-          console.error(e);
-          setError(e.message);
-          setStep('error');
-        }
-      }, 1500);
+        // Adaptar datos del API al formato del componente
+        const formattedData = {
+          name: `${nombre} ${apellido}`.trim() || "PACIENTE DESCONOCIDO",
+          bloodType: data.tipoSangre === 'string' ? "N/A" : (data.tipoSangre || "N/A"),
+          allergies: data.alergias === 'string' ? "Ninguna registrada" : (data.alergias || "Ninguna registrada"),
+          nss: data.numeroSeguroSocial === 'string' ? "No disponible" : (data.numeroSeguroSocial || "No disponible"),
+          religion: data.religion === 'string' ? "No especificada" : (data.religion || "No especificada"),
+          chronicDisease: data.condiciones === 'string' ? "Ninguna registrada" : (data.condiciones || "Ninguna registrada"),
+          baseMedication: data.medicacion === 'string' ? "Sin medicación" : (data.medicacion || "Sin medicación"),
+          isDonor: data.esDonante === true || data.esDonante === "true",
+          history: data.notaEmergencia === 'string' ? "Sin notas adicionales" : (data.notaEmergencia || "Sin notas adicionales"),
+          contacts: (data.contactos || []).map(c => ({
+            name: c.nombre || c.name || "Contacto",
+            relation: c.parentesco || c.relation || "Familiar",
+            phone: c.telefono || c.phone || "No registrado"
+          }))
+        };
+        setBasicData(formattedData);
+        setStep('success');
+      } catch (e) {
+        console.error(e);
+        setError(e.message);
+        setStep('error');
+      }
     }, 2000);
   };
 
@@ -125,7 +125,7 @@ const EmergencyAction = () => {
           <Cpu size={48} className="text-myhealth-blue relative z-10" />
         </div>
         <p className="text-xl font-black italic uppercase tracking-tighter text-center text-slate-800">
-          {step === 'scanning' ? 'Buscando NFC...' : 'NFC detectado, validando informacion...'}
+          Cargando Información del Paciente...
         </p>
       </div>
     );
@@ -195,22 +195,28 @@ const EmergencyAction = () => {
             <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
               <Phone size={18} className="text-red-600" /> Llamar a familiares
             </h4>
-            {basicData?.contacts.map((contact, i) => (
-              <a 
-                key={i} 
-                href={`tel:${contact.phone}`} 
-                className="flex items-center justify-between p-6 bg-white rounded-[32px] border-2 border-slate-200 shadow-md active:scale-95 transition-all hover:border-myhealth-blue"
-              >
-                <div className="space-y-1">
-                  <p className="text-2xl font-black text-slate-900 uppercase">{contact.name}</p>
-                  <p className="text-lg font-bold text-myhealth-blue">{contact.phone}</p>
-                  <p className="text-xs font-bold text-slate-400 uppercase">{contact.relation}</p>
-                </div>
-                <div className="bg-red-600 text-white p-5 rounded-2xl shadow-lg shadow-red-200">
-                  <Phone size={32} />
-                </div>
-              </a>
-            ))}
+            {basicData?.contacts && basicData.contacts.length > 0 ? (
+              basicData.contacts.map((contact, i) => (
+                <a 
+                  key={i} 
+                  href={`tel:${contact.phone}`} 
+                  className="flex items-center justify-between p-6 bg-white rounded-[32px] border-2 border-slate-200 shadow-md active:scale-95 transition-all hover:border-myhealth-blue"
+                >
+                  <div className="space-y-1">
+                    <p className="text-2xl font-black text-slate-900 uppercase">{contact.name}</p>
+                    <p className="text-lg font-bold text-myhealth-blue">{contact.phone}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase">{contact.relation}</p>
+                  </div>
+                  <div className="bg-red-600 text-white p-5 rounded-2xl shadow-lg shadow-red-200">
+                    <Phone size={32} />
+                  </div>
+                </a>
+              ))
+            ) : (
+              <div className="p-6 bg-white rounded-[32px] border-2 border-slate-200 text-center">
+                <p className="text-sm font-bold text-slate-400 uppercase">Sin contactos registrados</p>
+              </div>
+            )}
           </div>
 
           {/* ACCESO A BÓVEDA (DISCRETO PERO ACCESIBLE) */}
