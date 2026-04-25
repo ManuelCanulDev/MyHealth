@@ -19,9 +19,9 @@ FROM node:20-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
-COPY package.json package-lock.json* ./
-# --omit=optional: fsevents (darwin) en el lockfile de macOS rompe npm ci en Linux.
-RUN npm ci --omit=dev --omit=optional
+# Sin package-lock aquí: el lock generado en macOS arrastra fsevents (darwin) y `npm ci` falla en Linux.
+COPY package.json ./
+RUN npm install --omit=dev --no-audit --no-fund
 COPY backend ./backend
 COPY landing ./landing
 COPY INTEGRACION_APP.md ./INTEGRACION_APP.md
