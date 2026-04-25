@@ -15,32 +15,9 @@ function App() {
   const [publicProfileData, setPublicProfileData] = useState(null);
 
   useEffect(() => {
-    const path = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
     
-    // Revisar si es una URL de demostración de paciente
-    if (path.startsWith('/paciente/')) {
-      const walletId = path.split('/paciente/')[1];
-      
-      // Cargar datos de prueba de Juan Perez para la demostración
-      setPublicProfileData({
-        name: "JUAN PÉREZ (MUESTRA)",
-        phone: "+52 33 1234 5678",
-        nss: "1234-56-7890",
-        bloodType: "O+",
-        religion: "Católico",
-        chronicDisease: "Diabetes Tipo 2",
-        allergies: "Penicilina",
-        baseMedication: "Metformina / Insulina",
-        history: "Cirugía de Apéndice (2024), Tratamiento Hipertensión desde 2023.",
-        isDonor: true,
-        contacts: [
-          { name: "María (Esposa)", phone: "+52 33 1234 5678", email: "maria@example.com", relation: "Esposa", active: true },
-          { name: "Carlos (Hijo)", phone: "+52 33 8765 4321", email: "carlos@example.com", relation: "Hijo", active: true }
-        ]
-      });
-      setActiveTab('public-profile');
-    } else if (params.get('scan') === 'true') {
+    if (params.get('scan') === 'true') {
       setActiveTab('emergency');
       setAutoScan(true);
     }
@@ -144,25 +121,52 @@ function App() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto md:max-w-2xl md:bottom-6 md:rounded-full md:shadow-2xl md:border md:border-slate-200 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
-        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'home' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto md:max-w-3xl md:bottom-6 md:rounded-full md:shadow-2xl md:border md:border-slate-200 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
+        <button onClick={() => { setActiveTab('home'); window.history.pushState({}, '', '/'); }} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'home' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Home size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Inicio</span>
         </button>
 
-        <button onClick={() => setActiveTab('monitoring')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'monitoring' ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => { setActiveTab('monitoring'); window.history.pushState({}, '', '/'); }} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'monitoring' ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
           <MapIcon size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Mapa</span>
         </button>
 
-        <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => { setActiveTab('emergency'); window.history.pushState({}, '', '/'); }} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Activity size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Rescate</span>
         </button>
 
-        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${['profile', 'register'].includes(activeTab) ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
+        <button 
+          onClick={() => {
+            setPublicProfileData({
+              name: "JUAN PÉREZ (MUESTRA)",
+              phone: "+52 33 1234 5678",
+              nss: "1234-56-7890",
+              bloodType: "O+",
+              religion: "Católico",
+              chronicDisease: "Diabetes Tipo 2",
+              allergies: "Penicilina",
+              baseMedication: "Metformina / Insulina",
+              history: "Cirugía de Apéndice (2024), Tratamiento Hipertensión desde 2023.",
+              isDonor: true,
+              contacts: [
+                { name: "María (Esposa)", phone: "+52 33 1234 5678", email: "maria@example.com", relation: "Esposa", active: true },
+                { name: "Carlos (Hijo)", phone: "+52 33 8765 4321", email: "carlos@example.com", relation: "Hijo", active: true }
+              ]
+            });
+            setActiveTab('public-profile');
+            window.history.pushState({}, '', '/paciente/0xABCD1234...');
+          }} 
+          className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'public-profile' ? 'text-amber-500 scale-110' : 'text-slate-300'}`}
+        >
+          <Globe size={22} />
+          <span className="text-[9px] font-black uppercase tracking-tighter">Paciente</span>
+        </button>
+
+        <button onClick={() => { setActiveTab('profile'); window.history.pushState({}, '', '/'); }} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${['profile', 'register'].includes(activeTab) ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
           <User size={22} />
-          <span className="text-[9px] font-black uppercase tracking-tighter">Perfil</span>
+          <span className="text-[9px] font-black uppercase tracking-tighter">Mi Perfil</span>
         </button>
       </nav>
     </div>
