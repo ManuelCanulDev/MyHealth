@@ -7,7 +7,7 @@ import ActivityView from './components/ActivityView';
 import { Activity, User, Home, History } from 'lucide-react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home'); // home, emergency, profile, register, activity
+  const [activeTab, setActiveTab] = useState('home'); // home, emergency, profile, register
   const [isRegistered, setIsRegistered] = useState(false);
   const [userData, setUserData] = useState(null);
   const [autoScan, setAutoScan] = useState(false);
@@ -90,12 +90,6 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'activity' && (
-          <div className="p-6">
-            <ActivityView />
-          </div>
-        )}
-
         {activeTab === 'register' && (
           <div className="p-6">
             <RegisterForm onComplete={handleRegistrationComplete} />
@@ -112,11 +106,6 @@ function App() {
         <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Activity size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Rescate</span>
-        </button>
-
-        <button onClick={() => setActiveTab('activity')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'activity' ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
-          <History size={22} />
-          <span className="text-[9px] font-black uppercase tracking-tighter">Bitácora</span>
         </button>
 
         <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-all ${['profile', 'register'].includes(activeTab) ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>

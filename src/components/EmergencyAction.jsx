@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldAlert, MapPin, Cpu, CheckCircle2, AlertCircle, Lock, Unlock, History, Droplet, Phone } from 'lucide-react';
+import ActivityView from './ActivityView';
 
 const EmergencyAction = () => {
   const [step, setStep] = useState('idle'); 
@@ -216,6 +217,13 @@ const EmergencyAction = () => {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="pt-6 border-t border-slate-100">
+        <ActivityView 
+          title="Historial de Accesos" 
+          subtitle="Registros de esta pulsera en la Blockchain" 
+        />
       </div>
 
       <button onClick={() => window.location.reload()} className="w-full text-slate-300 font-bold text-[10px] uppercase tracking-widest py-4">

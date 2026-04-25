@@ -1,7 +1,7 @@
 import React from 'react';
 import { History, Shield, MapPin, ExternalLink } from 'lucide-react';
 
-const ActivityView = () => {
+const ActivityView = ({ title = "Bitácora de Seguridad", subtitle = "Registros inmutables en Monad" }) => {
   const logs = [
     {
       id: 1,
@@ -35,8 +35,8 @@ const ActivityView = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       <header className="space-y-1">
-        <h2 className="text-2xl font-black italic uppercase tracking-tighter">Bitácora de Seguridad</h2>
-        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Registros inmutables en Monad</p>
+        <h2 className="text-2xl font-black italic uppercase tracking-tighter">{title}</h2>
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{subtitle}</p>
       </header>
 
       <div className="space-y-4">

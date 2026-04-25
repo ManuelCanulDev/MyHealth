@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Fingerprint, CreditCard, ChevronRight, Settings, Bell, Eye, Lock, Unlock, FileText, Activity, History } from 'lucide-react';
+import ActivityView from './ActivityView';
 
 const ProfileView = ({ data, onTabChange }) => {
   const [showVault, setShowVault] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
   const [userData] = useState({
     name: data?.name || "Juan Pérez",
     nfcId: data?.nfcId || "MH-8829-01X",
@@ -203,13 +205,22 @@ const ProfileView = ({ data, onTabChange }) => {
           <span className="text-[9px] font-black uppercase">Ajustes</span>
         </button>
         <button 
-          onClick={() => onTabChange('activity')}
-          className="flex-1 bg-slate-100 p-4 rounded-2xl text-slate-500 flex flex-col items-center gap-1 transition-colors hover:bg-slate-200 active:scale-95"
+          onClick={() => setShowActivity(!showActivity)}
+          className={`flex-1 p-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95 ${showActivity ? 'bg-myhealth-blue text-white shadow-lg shadow-blue-100' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
         >
           <History size={20} />
           <span className="text-[9px] font-black uppercase">Wallet</span>
         </button>
       </div>
+
+      {showActivity && (
+        <div className="pt-4 animate-in slide-in-from-bottom-4 duration-500">
+          <ActivityView 
+            title="Mi Actividad" 
+            subtitle="Tus transacciones y accesos recientes" 
+          />
+        </div>
+      )}
 
     </div>
   );
