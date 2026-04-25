@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { updateMedicalRecord, addEmergencyContact } from '../api';
 import { User, Droplet, ShieldAlert, CheckCircle, ArrowRight, ArrowLeft, Cpu, Heart, Phone, Lock, FileText, Edit2, ShieldCheck } from 'lucide-react';
 
 const RegisterForm = ({ onComplete }) => {
@@ -68,9 +69,42 @@ const RegisterForm = ({ onComplete }) => {
     };
 
     console.log("Registrando en Monad...", formattedData);
-    await new Promise(r => setTimeout(r, 3000));
-    setIsMinting(false);
-    onComplete(formattedData);
+    
+    try {
+      const apiData = {
+        alergias: formData.allergies,
+        condiciones: formData.chronicDisease,
+        medicacion: formData.baseMedication,
+        notaEmergencia: formData.history,
+        religion: formData.religion,
+        numeroSeguroSocial: formData.nss,
+        tipoSangre: formData.bloodType,
+        perfilNombre: formData.name,
+        perfilTelefono: formData.phone,
+        notificar: false
+      };
+      
+      await updateMedicalRecord(null, apiData);
+      
+      // Save contacts
+      for (const contact of formattedData.contacts) {
+         if (contact.name && contact.phone) {
+           await addEmergencyContact(null, {
+             nombre: contact.name,
+             parentesco: contact.relation,
+             telefono: contact.phone,
+             email: contact.email
+           });
+         }
+      }
+      
+      setIsMinting(false);
+      onComplete(formattedData);
+    } catch (err) {
+      console.error(err);
+      alert("Hubo un error al guardar en la blockchain: " + err.message);
+      setIsMinting(false);
+    }
   };
 
   const inputStyle = "w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-myhealth-blue outline-none transition-all font-medium text-slate-700 bg-white shadow-sm text-sm";

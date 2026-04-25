@@ -1,41 +1,75 @@
 # MyHealth 🛡️💊
 
-**MyHealth** es una aplicación descentralizada diseñada para salvar vidas mediante la gestión segura de información médica de emergencia. Utiliza tecnología Blockchain y dispositivos NFC para permitir que los rescatistas accedan a datos vitales de forma inmediata, manteniendo la privacidad del paciente bajo un sistema de cifrado con PIN.
+**MyHealth** es una plataforma descentralizada (dApp) integral diseñada para la gestión segura y el acceso inmediato a información médica crítica en situaciones de emergencia. Mediante el uso de **Blockchain (Monad Testnet)** y dispositivos **NFC**, MyHealth permite que el personal de rescate acceda a datos vitales que salvan vidas, manteniendo la soberanía de los datos del paciente y garantizando la inmutabilidad de la información.
 
 ## 🚀 Funcionalidades Principales
 
-- **Escaner NFC Simulado:** Simulación de lectura de brazaletes médicos con validación de datos en tiempo real.
-- **Bóveda Médica Protegida:** Información sensible (historial clínico, enfermedades, medicación) protegida por un PIN de 4 dígitos.
-- **Registro en Blockchain:** Los datos de salud y los contactos de emergencia se protocolizan de forma segura.
-- **Historial de Accesos:** Registro inmutable de cada vez que la información ha sido consultada por personal de emergencia.
-- **Ficha Médica de Emergencia:** Acceso rápido a datos críticos como tipo de sangre, alergias y contactos SOS sin necesidad de desbloqueo.
+- **Ecosistema On-Chain (Monad):** Fichas médicas, contactos de emergencia y registros de acceso almacenados de forma inmutable en la red Monad (Chain ID 10143).
+- **Acceso mediante NFC y QR:** Simulación de lectura de brazaletes y escaneo de códigos QR para recuperación instantánea de perfiles médicos.
+- **Bóveda Médica Segura:** Información sensible protegida y segmentada, permitiendo acceso público a datos críticos (alergias, tipo de sangre) y acceso controlado a información detallada.
+- **Notificaciones de Emergencia:** Alertas automáticas vía SMS y Correo Electrónico (Twilio/SendGrid) a los contactos SOS cuando se registra un acceso de emergencia.
+- **Mapa de Emergencias On-Chain:** Sistema de geolocalización de alertas activas integrado directamente en el Smart Contract.
+- **Gestión de Identidad:** Perfiles de usuario con fotografía, datos de seguro social y religión para una atención personalizada y respetuosa.
 
 ## 🏗️ Estructura del Proyecto
 
-El repositorio está dividido en los siguientes módulos:
-- **`/frontend`**: Interfaz de usuario interactiva desarrollada en React y Vite. [Ver documentación del Frontend](./frontend/README.md)
-- **`/backend`**: *(Próximamente)* Lógica del servidor, API y conexión con los Smart Contracts en Blockchain.
+El sistema está compuesto por cuatro pilares fundamentales:
 
-## 📦 Instalación General
+1. **`/application`**: Aplicación móvil multiplataforma desarrollada en **Flutter**. Incluye el módulo de lectura NFC y la interfaz de visualización de emergencia para rescatistas.
+2. **`/frontend`**: Panel de control web desarrollado en **React + Vite**. Permite a los usuarios gestionar su ficha médica, configurar contactos y visualizar el historial de accesos.
+3. **`/backend`**: API REST robusta en **Node.js** que actúa como puente entre los clientes y la Blockchain, gestionando firmas, notificaciones y la documentación OpenAPI/Swagger.
+4. **`/backend/contracts`**: Smart Contracts desarrollados en **Solidity** utilizando **Foundry** y **Truffle**, optimizados para la red Monad.
 
-1. **Clonar el repositorio:**
-   ```bash
-   git clone git@github.com:ManuelCanulDev/MyHealth.git
-   cd MyHealth
-   ```
+## 🛠️ Tecnologías Utilizadas
 
-2. **Para correr el Frontend:**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+- **Blockchain:** Monad Testnet (EVM Compatible).
+- **Contratos:** Solidity, Foundry, Truffle.
+- **Frontend Web:** React 18, Vite, Tailwind CSS, Lucide React.
+- **App Móvil:** Flutter, Dart.
+- **Backend API:** Node.js, Express, Web3.js.
+- **Servicios Externos:** Twilio (SMS), SendGrid (Email).
+
+## 📦 Guía de Inicio Rápido
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/ManuelCanulDev/MyHealth.git
+cd MyHealth
+```
+
+### 2. Despliegue de Contratos (Backend)
+```bash
+cd backend
+npm install
+# Configura tu .env basado en .env.example
+npm run forge:deploy:monad
+```
+
+### 3. Ejecutar el Backend API
+```bash
+npm start
+```
+
+### 4. Ejecutar el Frontend Web
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+### 5. Ejecutar la App Móvil
+```bash
+cd ../application
+flutter pub get
+flutter run
+```
 
 ## 🔐 Seguridad y Privacidad
 
-MyHealth divide la información en dos capas:
-1. **Pública:** Datos de identificación rápida necesarios para la atención inmediata en el sitio.
-2. **Privada (Bóveda):** Historial clínico detallado que requiere autorización mediante PIN, garantizando que solo personal autorizado (o con el consentimiento del usuario) acceda a datos sensibles.
+MyHealth implementa un modelo de seguridad híbrido:
+1. **Capa On-Chain:** Los datos públicos de emergencia residen en el Smart Contract para disponibilidad inmediata 24/7.
+2. **Capa de Aplicación:** El acceso a la gestión de la ficha requiere la autenticación del propietario del contrato.
+3. **Privacidad:** Se recomienda el uso de CIDs de IPFS para archivos multimedia y el cifrado de campos sensibles antes de su almacenamiento on-chain si se requiere una capa adicional de privacidad.
 
 ---
-Desarrollado con ❤️ para el ecosistema Monad.
+Desarrollado con ❤️ para el ecosistema **Monad**.

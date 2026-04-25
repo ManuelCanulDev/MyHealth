@@ -44,7 +44,12 @@ const ProfileView = ({ data, contractAddress }) => {
         baseMedication: d.medicacion || "Ninguna",
         history: d.notaEmergencia || "Sin historial",
         isDonor: d.esDonante === true || d.esDonante === "true",
-        contacts: d.contactos || []
+        contacts: (d.contactos || []).map(c => ({
+          name: c.nombre || c.name || "Contacto",
+          relation: c.parentesco || c.relation || "Familiar",
+          phone: c.telefono || c.phone || "No registrado",
+          email: c.email || "No registrado"
+        }))
       });
     } catch (e) {
       setError(e.message);
@@ -130,11 +135,11 @@ const ProfileView = ({ data, contractAddress }) => {
                 <div key={i} className="flex items-center justify-between p-4 bg-white rounded-[24px] shadow-sm border border-slate-100 group hover:border-myhealth-red transition-colors cursor-pointer">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-myhealth-red/10 rounded-full flex items-center justify-center text-myhealth-red text-xs font-black">
-                      {contact.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      {(contact.name || "C").split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-800 leading-tight group-hover:text-myhealth-red transition-colors">{contact.name}</p>
-                      <p className="text-[10px] text-slate-400 font-medium">{contact.relation}</p>
+                      <p className="text-sm font-bold text-slate-800 leading-tight group-hover:text-myhealth-red transition-colors">{contact.name || "Contacto"}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{contact.relation || "Familiar"}</p>
                     </div>
                   </div>
                   <ChevronRight size={18} className="text-slate-300" />

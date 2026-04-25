@@ -13,13 +13,29 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [autoScan, setAutoScan] = useState(false);
   const [publicProfileData, setPublicProfileData] = useState(null);
+  const [publicContractAddress, setPublicContractAddress] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const pathname = window.location.pathname;
     
     if (params.get('scan') === 'true') {
       setActiveTab('emergency');
       setAutoScan(true);
+    } else if (pathname.startsWith('/paciente')) {
+      const address = pathname.split('/paciente/')[1] || pathname.split('/paciente')[1];
+      if (address && address.length > 2) {
+        setPublicContractAddress(address);
+        setActiveTab('public-profile');
+        setPublicProfileData(null); // Force ProfileView to load from contractAddress
+      } else {
+        // No address provided in URL, use default from .env
+        const defaultAddress = import.meta.env.VITE_DEFAULT_CONTRACT_ADDRESS || "0x88a935692Dbf2704aB5EF855fD6C9bfa9c38129D";
+        setPublicContractAddress(defaultAddress);
+        setActiveTab('public-profile');
+        setPublicProfileData(null);
+        window.history.replaceState({}, '', `/paciente/${defaultAddress}`);
+      }
     }
   }, []);
 
@@ -62,7 +78,7 @@ function App() {
               <p className="text-[10px] font-black text-amber-700 uppercase tracking-[0.2em]">Vista Pública de solo lectura</p>
               <p className="text-xs font-bold text-amber-800">Cualquier cambio requiere autorización firmada por el titular.</p>
             </div>
-            <ProfileView data={publicProfileData} />
+            <ProfileView data={publicProfileData} contractAddress={publicContractAddress} />
           </div>
         )}
 
@@ -139,24 +155,11 @@ function App() {
 
         <button 
           onClick={() => {
-            setPublicProfileData({
-              name: "JUAN PÉREZ (MUESTRA)",
-              phone: "+52 33 1234 5678",
-              nss: "1234-56-7890",
-              bloodType: "O+",
-              religion: "Católico",
-              chronicDisease: "Diabetes Tipo 2",
-              allergies: "Penicilina",
-              baseMedication: "Metformina / Insulina",
-              history: "Cirugía de Apéndice (2024), Tratamiento Hipertensión desde 2023.",
-              isDonor: true,
-              contacts: [
-                { name: "María (Esposa)", phone: "+52 33 1234 5678", email: "maria@example.com", relation: "Esposa", active: true },
-                { name: "Carlos (Hijo)", phone: "+52 33 8765 4321", email: "carlos@example.com", relation: "Hijo", active: true }
-              ]
-            });
+            const defaultAddress = import.meta.env.VITE_DEFAULT_CONTRACT_ADDRESS || "0x88a935692Dbf2704aB5EF855fD6C9bfa9c38129D";
+            setPublicProfileData(null);
+            setPublicContractAddress(defaultAddress);
             setActiveTab('public-profile');
-            window.history.pushState({}, '', '/paciente/0xABCD1234...');
+            window.history.pushState({}, '', `/paciente/${defaultAddress}`);
           }} 
           className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'public-profile' ? 'text-amber-500 scale-110' : 'text-slate-300'}`}
         >

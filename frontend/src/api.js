@@ -86,3 +86,26 @@ export const triggerEmergencyAlert = async (contractAddress, location, details) 
   }
   return response.json();
 };
+
+/**
+ * Agrega un contacto de emergencia.
+ * @param {string} contractAddress 
+ * @param {Object} data { nombre, parentesco, telefono, email }
+ */
+export const addEmergencyContact = async (contractAddress, data) => {
+  const response = await fetch(`${getApiBaseUrl()}/api/contactos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      contract: contractAddress,
+      ...data
+    }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Error al agregar contacto de emergencia');
+  }
+  return response.json();
+};
