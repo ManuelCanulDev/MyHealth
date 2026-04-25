@@ -5,17 +5,42 @@ import ProfileView from './components/ProfileView';
 import RegisterForm from './components/RegisterForm';
 import ActivityView from './components/ActivityView';
 import MonitoringMap from './components/MonitoringMap';
-import { Activity, User, Home, History, Map as MapIcon } from 'lucide-react';
+import { Activity, User, Home, History, Map as MapIcon, Globe } from 'lucide-react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home'); // home, emergency, profile, register, monitoring
+  const [activeTab, setActiveTab] = useState('home'); // home, emergency, profile, register, monitoring, public-profile
   const [isRegistered, setIsRegistered] = useState(false);
   const [userData, setUserData] = useState(null);
   const [autoScan, setAutoScan] = useState(false);
+  const [publicProfileData, setPublicProfileData] = useState(null);
 
   useEffect(() => {
+    const path = window.location.pathname;
     const params = new URLSearchParams(window.location.search);
-    if (params.get('scan') === 'true') {
+    
+    // Revisar si es una URL de demostración de paciente
+    if (path.startsWith('/paciente/')) {
+      const walletId = path.split('/paciente/')[1];
+      
+      // Cargar datos de prueba de Juan Perez para la demostración
+      setPublicProfileData({
+        name: "JUAN PÉREZ (MUESTRA)",
+        phone: "+52 33 1234 5678",
+        nss: "1234-56-7890",
+        bloodType: "O+",
+        religion: "Católico",
+        chronicDisease: "Diabetes Tipo 2",
+        allergies: "Penicilina",
+        baseMedication: "Metformina / Insulina",
+        history: "Cirugía de Apéndice (2024), Tratamiento Hipertensión desde 2023.",
+        isDonor: true,
+        contacts: [
+          { name: "María (Esposa)", phone: "+52 33 1234 5678", email: "maria@example.com", relation: "Esposa", active: true },
+          { name: "Carlos (Hijo)", phone: "+52 33 8765 4321", email: "carlos@example.com", relation: "Hijo", active: true }
+        ]
+      });
+      setActiveTab('public-profile');
+    } else if (params.get('scan') === 'true') {
       setActiveTab('emergency');
       setAutoScan(true);
     }
@@ -30,7 +55,7 @@ function App() {
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-myhealth-blue selection:text-white pb-24">
       <header className="p-6 flex justify-between items-center bg-white/90 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-100">
-        <button onClick={() => setActiveTab('home')} className="flex items-center gap-2">
+        <button onClick={() => { setActiveTab('home'); window.history.pushState({}, '', '/'); }} className="flex items-center gap-2">
           <div className="bg-myhealth-red p-1.5 rounded-lg shadow-lg shadow-red-200">
             <Activity className="text-white" size={20} />
           </div>
@@ -51,6 +76,17 @@ function App() {
             onStartEmergency={() => setActiveTab('emergency')} 
             onStartRegister={() => setActiveTab('register')} 
           />
+        )}
+
+        {activeTab === 'public-profile' && (
+          <div className="p-6 space-y-6">
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-3xl text-center space-y-2">
+              <Globe size={24} className="text-amber-500 mx-auto" />
+              <p className="text-[10px] font-black text-amber-700 uppercase tracking-[0.2em]">Vista Pública de solo lectura</p>
+              <p className="text-xs font-bold text-amber-800">Cualquier cambio requiere autorización firmada por el titular.</p>
+            </div>
+            <ProfileView data={publicProfileData} />
+          </div>
         )}
 
         {activeTab === 'monitoring' && (

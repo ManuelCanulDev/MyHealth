@@ -35,15 +35,9 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button 
                 onClick={onStartRegister}
-                className="bg-myhealth-blue text-white px-8 py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 active:scale-95 transition-transform text-lg"
+                className="bg-myhealth-blue text-white px-8 py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 active:scale-95 transition-transform text-lg w-full sm:w-auto"
               >
                 Crear mi Pasaporte
-              </button>
-              <button 
-                onClick={onStartEmergency}
-                className="bg-white text-slate-800 border-2 border-slate-100 px-8 py-5 rounded-3xl font-black uppercase tracking-widest shadow-sm active:scale-95 transition-transform text-lg md:hidden"
-              >
-                Escanear Paciente
               </button>
             </div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
@@ -97,7 +91,7 @@ const LandingPage = ({ onStartEmergency, onStartRegister }) => {
           onClick={onStartEmergency}
           className="bg-myhealth-red hover:bg-red-600 text-white px-12 py-5 rounded-full font-black uppercase text-sm tracking-widest relative z-10 transition-colors shadow-2xl shadow-red-500/20"
         >
-          Escanear Paciente
+          Buscar Paciente
         </button>
       </section>
     </div>
