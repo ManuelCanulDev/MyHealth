@@ -29,134 +29,153 @@ const ProfileView = ({ data }) => {
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
       
       {/* HEADER DEL PERFIL */}
-      <div className="flex flex-col items-center text-center space-y-4 pt-4">
+      <div className="flex flex-col md:flex-row items-center md:items-end gap-6 pt-4 md:px-6">
         <div className="relative">
-          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-200 flex items-center justify-center text-slate-400">
-            <User size={48} />
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-200 flex items-center justify-center text-slate-400">
+            <User size={64} />
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-myhealth-blue border-2 border-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm">
-            <ShieldCheck size={14} className="text-white" />
+          <div className="absolute bottom-1 right-1 bg-myhealth-blue border-2 border-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
+            <ShieldCheck size={18} className="text-white" />
           </div>
         </div>
         
-        <div>
-          <h2 className="text-2xl font-black text-slate-900 italic tracking-tighter uppercase">{userData.name}</h2>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID Blockchain: {userData.nss}</p>
+        <div className="text-center md:text-left">
+          <h2 className="text-2xl md:text-4xl font-black text-slate-900 italic tracking-tighter uppercase">{userData.name}</h2>
+          <div className="flex items-center justify-center md:justify-start gap-2 mt-1">
+            <div className="bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+              <span className="text-[8px] font-bold text-amber-600 uppercase">Monad ID</span>
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{userData.nss}</p>
+          </div>
         </div>
       </div>
 
-      {/* SECCIÓN 1: DATOS DE IDENTIDAD */}
-      <section className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
-          <ShieldCheck size={14} /> Información de Identidad
-        </h3>
-        <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Hash size={10}/> NSS</p>
-              <p className="text-sm font-bold text-slate-800">{userData.nss}</p>
-            </div>
-            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Phone size={10}/> Teléfono</p>
-              <p className="text-sm font-bold text-slate-800">{userData.phone}</p>
-            </div>
-          </div>
-          <div className="pt-3 border-t border-slate-50 flex justify-between items-center">
-            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Lock size={10}/> PIN de Seguridad</p>
-              <p className="text-xs font-mono font-bold text-slate-500">**** (Configurado)</p>
-            </div>
-            <div className="bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-              <span className="text-[9px] font-black text-myhealth-blue uppercase">Protección Activa</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECCIÓN 2: FICHA MÉDICA COMPLETA */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between px-2">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-            <Eye size={14} className="text-myhealth-red" /> Ficha Médica
-          </h3>
-          <span className="text-[9px] bg-red-100 text-myhealth-red px-2 py-0.5 rounded-full font-bold uppercase">Uso en Emergencias</span>
-        </div>
-
-        <div className="bg-white rounded-[32px] p-6 shadow-xl border-l-[12px] border-myhealth-red relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-6 opacity-5">
-            <Activity size={80} />
-          </div>
-          
-          <div className="relative z-10 space-y-6">
-            <div className="grid grid-cols-3 gap-2">
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                <p className="text-[8px] font-bold text-slate-400 uppercase">Sangre</p>
-                <p className="text-xl font-black text-myhealth-red leading-none">{userData.bloodType}</p>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                <p className="text-[8px] font-bold text-slate-400 uppercase">Donador</p>
-                <p className={`text-xs font-black leading-none ${userData.isDonor ? 'text-green-600' : 'text-slate-400'}`}>
-                  {userData.isDonor ? 'SÍ' : 'NO'}
-                </p>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                <p className="text-[8px] font-bold text-slate-400 uppercase">Religión</p>
-                <p className="text-[10px] font-black text-slate-800 leading-none truncate">{userData.religion}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
+      <div className="grid md:grid-cols-3 gap-8">
+        {/* COLUMNA IZQUIERDA: INFORMACIÓN Y CONTACTOS */}
+        <div className="md:col-span-1 space-y-8">
+          {/* SECCIÓN 1: DATOS DE IDENTIDAD */}
+          <section className="space-y-4">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
+              <ShieldCheck size={14} /> Identidad
+            </h3>
+            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
               <div>
-                <p className="text-[9px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-2">
-                  <FileText size={10} /> Alergias & Historial Clínico
-                </p>
-                <div className="bg-slate-50 p-4 rounded-2xl space-y-2 border border-slate-100 leading-relaxed">
-                  <p className="text-xs font-black text-red-600 uppercase">Críticas: {userData.allergies}</p>
-                  <p className="text-xs font-semibold text-slate-700">{userData.history}</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Hash size={10}/> NSS</p>
+                <p className="text-sm font-bold text-slate-800">{userData.nss}</p>
+              </div>
+              <div>
+                <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Phone size={10}/> Teléfono</p>
+                <p className="text-sm font-bold text-slate-800">{userData.phone}</p>
+              </div>
+              <div className="pt-3 border-t border-slate-50">
+                <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Lock size={10}/> PIN de Seguridad</p>
+                <p className="text-xs font-mono font-bold text-slate-500">**** (Configurado)</p>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 3: RED DE APOYO */}
+          <section className="space-y-4">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
+              <Bell size={14} className="text-myhealth-red" /> Contactos SOS
+            </h3>
+            <div className="space-y-3">
+              {userData.contacts.map((contact, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-white rounded-[24px] shadow-sm border border-slate-100 group hover:border-myhealth-red transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-myhealth-red/10 rounded-full flex items-center justify-center text-myhealth-red text-xs font-black">
+                      {contact.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800 leading-tight group-hover:text-myhealth-red transition-colors">{contact.name}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{contact.relation}</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-300" />
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* COLUMNA DERECHA: FICHA MÉDICA (MAS ANCHA EN ESCRITORIO) */}
+        <div className="md:col-span-2 space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+              <Eye size={14} className="text-myhealth-red" /> Ficha Médica Completa
+            </h3>
+            <span className="text-[9px] bg-red-100 text-myhealth-red px-2 py-0.5 rounded-full font-bold uppercase">Acceso Rápido</span>
+          </div>
+
+          <div className="bg-white rounded-[40px] p-8 shadow-xl border-l-[12px] border-myhealth-red relative overflow-hidden h-full">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Activity size={120} />
+            </div>
+            
+            <div className="relative z-10 space-y-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 flex flex-col justify-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Grupo Sanguíneo</p>
+                  <p className="text-4xl md:text-5xl font-black text-myhealth-red leading-none">{userData.bloodType}</p>
+                </div>
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 flex flex-col justify-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Donador Org.</p>
+                  <p className={`text-xl md:text-2xl font-black leading-none ${userData.isDonor ? 'text-green-600' : 'text-slate-400'}`}>
+                    {userData.isDonor ? 'SÍ, ACTIVO' : 'NO'}
+                  </p>
+                </div>
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 md:col-span-1 col-span-2 flex flex-col justify-center">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Creencias / Religión</p>
+                  <p className="text-lg md:text-xl font-black text-slate-800 leading-none">{userData.religion}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <p className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">Enfermedades</p>
-                  <p className="text-slate-800 text-xs font-black uppercase italic">{userData.chronicDisease}</p>
+              <div className="grid md:grid-cols-2 gap-6 md:gap-8 pt-4">
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
+                      <ShieldAlert size={12} className="text-myhealth-red" /> Alergias Críticas
+                    </p>
+                    <div className="bg-red-50 p-6 rounded-[32px] border border-red-100">
+                      <p className="text-sm md:text-base font-black text-red-600 uppercase leading-relaxed">{userData.allergies}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
+                      <Activity size={12} className="text-myhealth-blue" /> Enfermedades
+                    </p>
+                    <div className="bg-blue-50 p-6 rounded-[32px] border border-blue-100">
+                      <p className="text-sm md:text-base font-black text-myhealth-blue uppercase italic">{userData.chronicDisease}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <p className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">Medicación</p>
-                  <p className="text-myhealth-blue text-xs font-bold leading-tight">{userData.baseMedication}</p>
+
+                <div className="space-y-6">
+                  <div className="h-full flex flex-col">
+                    <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
+                      <FileText size={12} /> Historial & Medicación
+                    </p>
+                    <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 flex-1 flex flex-col justify-between">
+                      <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase mb-3">Notas Médicas:</p>
+                        <p className="text-sm md:text-base font-semibold text-slate-700 leading-relaxed">{userData.history}</p>
+                      </div>
+                      <div className="mt-6 pt-6 border-t border-slate-200">
+                        <p className="text-[10px] font-black text-myhealth-blue uppercase mb-1">Medicamento Base:</p>
+                        <p className="text-sm font-bold text-slate-800">{userData.baseMedication}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* SECCIÓN 3: RED DE APOYO */}
-      <section className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
-          <Bell size={14} className="text-myhealth-red" /> Contactos SOS
-        </h3>
-        <div className="space-y-3">
-          {userData.contacts.map((contact, i) => (
-            <div key={i} className="flex items-center justify-between p-4 bg-white rounded-[24px] shadow-sm border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-myhealth-red/10 rounded-full flex items-center justify-center text-myhealth-red text-xs font-black">
-                  {contact.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800 leading-tight">{contact.name}</p>
-                  <p className="text-[10px] text-slate-400 font-medium">{contact.relation} • {contact.phone}</p>
-                </div>
-              </div>
-              <ChevronRight size={18} className="text-slate-300" />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="p-6 bg-slate-50 rounded-[32px] border border-dashed border-slate-200 text-center">
-        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-          Sincronizado con Monad Blockchain
+      <div className="p-8 bg-slate-50 rounded-[40px] border border-dashed border-slate-200 text-center">
+        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+          Sincronizado de forma segura con Monad Blockchain • ID: 0x{Math.random().toString(16).slice(2, 10).toUpperCase()}
         </p>
       </div>
 

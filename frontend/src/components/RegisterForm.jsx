@@ -102,214 +102,255 @@ const RegisterForm = ({ onComplete }) => {
 
       {/* PASO 1: Identificación */}
       {step === 1 && (
-        <div className="space-y-5 animate-in fade-in duration-300">
+        <div className="space-y-6 animate-in fade-in duration-300">
           <header>
-            <h2 className="text-2xl font-black italic uppercase tracking-tighter">Identidad</h2>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Información oficial</p>
+            <h2 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Identidad</h2>
+            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Información oficial para tu pasaporte médico</p>
           </header>
           
-          <div>
-            <label className={labelStyle}>Nombre Completo</label>
-            <input type="text" className={inputStyle} placeholder="Nombre y Apellidos" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <label className={labelStyle}>Nombre Completo</label>
+              <input type="text" className={inputStyle} placeholder="Nombre y Apellidos" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+            </div>
 
-          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelStyle}>Teléfono</label>
-              <input type="tel" className={inputStyle} placeholder="Tu número" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+              <label className={labelStyle}>Teléfono de Contacto</label>
+              <input type="tel" className={inputStyle} placeholder="Ej. +52 33 1234 5678" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
             </div>
             <div>
-              <label className={labelStyle}>NSS</label>
-              <input type="text" className={inputStyle} placeholder="Seguro Social" value={formData.nss} onChange={(e) => setFormData({...formData, nss: e.target.value})} />
+              <label className={labelStyle}>Número de Seguro Social (NSS)</label>
+              <input type="text" className={inputStyle} placeholder="Ej. 1234567890" value={formData.nss} onChange={(e) => setFormData({...formData, nss: e.target.value})} />
             </div>
           </div>
 
-          <button onClick={handleNext} disabled={!formData.name || !formData.nss} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 mt-4">
-            Siguiente <ArrowRight size={18} />
+          <button onClick={handleNext} disabled={!formData.name || !formData.nss} className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 mt-6 hover:bg-slate-800 transition-colors">
+            Siguiente Paso <ArrowRight size={18} />
           </button>
         </div>
       )}
 
       {/* PASO 2: Datos Médicos */}
       {step === 2 && (
-        <div className="space-y-5 animate-in fade-in duration-300">
+        <div className="space-y-6 animate-in fade-in duration-300">
           <header>
-            <h2 className="text-2xl font-black italic uppercase tracking-tighter">Ficha Médica</h2>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Vital para rescate</p>
+            <h2 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Ficha Médica</h2>
+            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Vital para protocolos de rescate</p>
           </header>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelStyle}>Sangre</label>
-              <select className={inputStyle} value={formData.bloodType} onChange={(e) => setFormData({...formData, bloodType: e.target.value})}>
-                <option value="">Tipo</option>
-                <option value="O+">O+</option><option value="O-">O-</option>
-                <option value="A+">A+</option><option value="A-">A-</option>
-                <option value="B+">B+</option><option value="B-">B-</option>
-                <option value="AB+">AB+</option><option value="AB-">AB-</option>
-              </select>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelStyle}>Tipo de Sangre</label>
+                <select className={inputStyle} value={formData.bloodType} onChange={(e) => setFormData({...formData, bloodType: e.target.value})}>
+                  <option value="">Tipo</option>
+                  <option value="O+">O+</option><option value="O-">O-</option>
+                  <option value="A+">A+</option><option value="A-">A-</option>
+                  <option value="B+">B+</option><option value="B-">B-</option>
+                  <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div className="flex flex-col">
+                <label className={labelStyle}>¿Donador?</label>
+                <button 
+                  onClick={() => setFormData({...formData, isDonor: !formData.isDonor})}
+                  className={`flex-1 rounded-2xl border-2 transition-all font-black uppercase text-[10px] tracking-widest ${formData.isDonor ? 'bg-green-50 border-green-200 text-green-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
+                >
+                  {formData.isDonor ? 'Sí, Donante' : 'No'}
+                </button>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <label className={labelStyle}>¿Donador?</label>
-              <button 
-                onClick={() => setFormData({...formData, isDonor: !formData.isDonor})}
-                className={`flex-1 rounded-2xl border-2 transition-all font-black uppercase text-[10px] tracking-widest ${formData.isDonor ? 'bg-green-50 border-green-200 text-green-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
-              >
-                {formData.isDonor ? 'Sí, Donante' : 'No'}
-              </button>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelStyle}>Religión (Opcional)</label>
-              <input type="text" className={inputStyle} placeholder="Ej. Católico..." value={formData.religion} onChange={(e) => setFormData({...formData, religion: e.target.value})} />
+              <label className={labelStyle}>Religión o Creencias</label>
+              <input type="text" className={inputStyle} placeholder="Ej. Católico, Testigo de Jehová..." value={formData.religion} onChange={(e) => setFormData({...formData, religion: e.target.value})} />
             </div>
+
+            <div className="md:col-span-2">
+              <label className={labelStyle}>Alergias Críticas (¡Muy importante!)</label>
+              <input type="text" className={inputStyle} placeholder="Ej. Penicilina, Látex, Abejas..." value={formData.allergies} onChange={(e) => setFormData({...formData, allergies: e.target.value})} />
+            </div>
+
             <div>
               <label className={labelStyle}>Enfermedad Crónica</label>
-              <input type="text" className={inputStyle} placeholder="Ej. Diabetes..." value={formData.chronicDisease} onChange={(e) => setFormData({...formData, chronicDisease: e.target.value})} />
+              <input type="text" className={inputStyle} placeholder="Ej. Diabetes Tipo 1, Asma..." value={formData.chronicDisease} onChange={(e) => setFormData({...formData, chronicDisease: e.target.value})} />
+            </div>
+            
+            <div>
+              <label className={labelStyle}>Medicamento Base</label>
+              <input type="text" className={inputStyle} placeholder="Ej. Insulina, Salbutamol..." value={formData.baseMedication} onChange={(e) => setFormData({...formData, baseMedication: e.target.value})} />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className={labelStyle}>Breve Historial / Cirugías</label>
+              <textarea 
+                className={`${inputStyle} h-24 resize-none`} 
+                placeholder="Ej. Cirugía de corazón (2015), Marcapasos..." 
+                value={formData.history} 
+                onChange={(e) => setFormData({...formData, history: e.target.value})}
+              />
             </div>
           </div>
 
-          <div>
-            <label className={labelStyle}>Alergias Críticas</label>
-            <input type="text" className={inputStyle} placeholder="Ej. Penicilina, Nueces..." value={formData.allergies} onChange={(e) => setFormData({...formData, allergies: e.target.value})} />
-          </div>
-
-          <div>
-            <label className={labelStyle}>Medicamento Base / Historial</label>
-            <textarea 
-              className={`${inputStyle} h-20 resize-none`} 
-              placeholder="Ej. Insulina, Cirugía de apéndice (2020)..." 
-              value={formData.history} 
-              onChange={(e) => setFormData({...formData, history: e.target.value})}
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button onClick={handleBack} className="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase tracking-widest">Atrás</button>
-            <button onClick={handleNext} className="flex-[2] bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2">Siguiente <ArrowRight size={18} /></button>
+          <div className="flex gap-4 mt-6">
+            <button onClick={handleBack} className="flex-1 bg-slate-100 text-slate-500 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Atrás</button>
+            <button onClick={handleNext} className="flex-[2] bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors">Siguiente <ArrowRight size={18} /></button>
           </div>
         </div>
       )}
 
       {/* PASO 3: Contactos SOS */}
       {step === 3 && (
-        <div className="space-y-5 animate-in fade-in duration-300">
+        <div className="space-y-6 animate-in fade-in duration-300">
           <header>
-            <h2 className="text-2xl font-black italic uppercase tracking-tighter">Contactos SOS</h2>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">¿A quién avisamos?</p>
+            <h2 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter">Contactos SOS</h2>
+            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">¿A quién avisamos en caso de emergencia?</p>
           </header>
 
-          <div className="bg-slate-50 p-4 rounded-3xl space-y-4">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><Phone size={10} /> Contacto Principal</p>
-            <input type="text" className={inputStyle} placeholder="Nombre del contacto" value={formData.contact1Name} onChange={(e) => setFormData({...formData, contact1Name: e.target.value})} />
-            <div className="grid grid-cols-2 gap-3">
-              <input type="tel" className={inputStyle} placeholder="Teléfono" value={formData.contact1Phone} onChange={(e) => setFormData({...formData, contact1Phone: e.target.value})} />
-              <input type="text" className={inputStyle} placeholder="Parentesco" value={formData.contact1Relation} onChange={(e) => setFormData({...formData, contact1Relation: e.target.value})} />
+          <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] space-y-6 border border-slate-100">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Phone size={12} className="text-myhealth-red" /> Contacto de Emergencia Principal</p>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <label className={labelStyle}>Nombre del Familiar o Amigo</label>
+                <input type="text" className={inputStyle} placeholder="Ej. María García" value={formData.contact1Name} onChange={(e) => setFormData({...formData, contact1Name: e.target.value})} />
+              </div>
+              <div>
+                <label className={labelStyle}>Teléfono Directo</label>
+                <input type="tel" className={inputStyle} placeholder="Ej. +52 33 1234 5678" value={formData.contact1Phone} onChange={(e) => setFormData({...formData, contact1Phone: e.target.value})} />
+              </div>
+              <div>
+                <label className={labelStyle}>Parentesco</label>
+                <input type="text" className={inputStyle} placeholder="Ej. Esposa, Hijo, Hermano" value={formData.contact1Relation} onChange={(e) => setFormData({...formData, contact1Relation: e.target.value})} />
+              </div>
+              <div className="md:col-span-2">
+                <label className={labelStyle}>Correo Electrónico (Opcional)</label>
+                <input type="email" className={inputStyle} placeholder="familiar@correo.com" value={formData.contact1Email} onChange={(e) => setFormData({...formData, contact1Email: e.target.value})} />
+              </div>
             </div>
-            <input type="email" className={inputStyle} placeholder="Correo Electrónico" value={formData.contact1Email} onChange={(e) => setFormData({...formData, contact1Email: e.target.value})} />
           </div>
 
-          <div className="flex gap-3">
-            <button onClick={handleBack} className="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase tracking-widest">Atrás</button>
-            <button onClick={handleNext} disabled={!formData.contact1Name || !formData.contact1Phone} className="flex-[2] bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2">Siguiente <ArrowRight size={18} /></button>
+          <div className="flex gap-4 mt-6">
+            <button onClick={handleBack} className="flex-1 bg-slate-100 text-slate-500 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Atrás</button>
+            <button onClick={handleNext} disabled={!formData.contact1Name || !formData.contact1Phone} className="flex-[2] bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-slate-800 transition-colors">Siguiente <ArrowRight size={18} /></button>
           </div>
         </div>
       )}
 
       {/* PASO 4: Seguridad (PIN) */}
       {step === 4 && (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          <header className="text-center">
-            <div className="mx-auto w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-myhealth-blue mb-4">
-              <Lock size={32} />
+        <div className="space-y-8 animate-in fade-in duration-300 py-6">
+          <header className="text-center space-y-2">
+            <div className="mx-auto w-20 h-20 bg-blue-50 rounded-[24px] flex items-center justify-center text-myhealth-blue mb-4 border border-blue-100">
+              <Lock size={40} />
             </div>
-            <h2 className="text-2xl font-black italic uppercase tracking-tighter">PIN de Bóveda</h2>
-            <p className="text-slate-500 text-xs font-medium px-4">Solo los rescatistas autorizados verán tu historial al ingresar este PIN.</p>
+            <h2 className="text-3xl font-black italic uppercase tracking-tighter">PIN de Seguridad</h2>
+            <p className="text-slate-500 text-sm font-medium max-w-sm mx-auto leading-relaxed">
+              Crea una clave de 4 dígitos. Los paramédicos la usarán para desbloquear tu historial clínico completo.
+            </p>
           </header>
 
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-full max-w-[280px]">
+          <div className="flex flex-col items-center gap-6">
+            <div className="w-full max-w-[320px]">
               <input 
                 type="password" 
                 maxLength="4"
-                className="w-full text-center text-4xl tracking-[0.8em] font-black p-5 rounded-3xl border-2 border-slate-100 focus:border-myhealth-blue outline-none transition-all bg-slate-50/50 pr-0 pl-[0.8em]"
+                className="w-full text-center text-5xl tracking-[0.8em] font-black p-6 rounded-[32px] border-2 border-slate-100 focus:border-myhealth-blue outline-none transition-all bg-slate-50/50 pr-0 pl-[0.8em] shadow-inner"
                 placeholder="****"
                 value={formData.pin}
                 onChange={(e) => setFormData({...formData, pin: e.target.value.replace(/\D/g, '')})}
               />
             </div>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">4 dígitos numéricos</p>
+            <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-full border border-amber-100">
+              <ShieldAlert size={14} className="text-amber-500" />
+              <p className="text-[10px] text-amber-700 font-black uppercase tracking-widest">No olvides este PIN</p>
+            </div>
           </div>
 
-          <div className="flex gap-3 mt-8">
-            <button onClick={handleBack} className="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase tracking-widest">Atrás</button>
-            <button onClick={handleNext} disabled={formData.pin.length !== 4} className="flex-[2] bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50">Revisar <ArrowRight size={18} /></button>
+          <div className="flex gap-4 mt-8 max-w-md mx-auto">
+            <button onClick={handleBack} className="flex-1 bg-slate-100 text-slate-500 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Atrás</button>
+            <button onClick={handleNext} disabled={formData.pin.length !== 4} className="flex-[2] bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-slate-800 transition-colors">Revisar Datos <ArrowRight size={18} /></button>
           </div>
         </div>
       )}
 
       {/* PASO 5: Revisión Final */}
       {step === 5 && (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="space-y-8 animate-in fade-in duration-300">
           <header className="text-center">
-            <div className="mx-auto w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-600 mb-4">
-              <CheckCircle size={32} />
+            <div className="mx-auto w-20 h-20 bg-green-50 rounded-[24px] flex items-center justify-center text-green-600 mb-4 border border-green-100">
+              <CheckCircle size={40} />
             </div>
-            <h2 className="text-2xl font-black italic uppercase tracking-tighter">Revisión Final</h2>
-            <p className="text-slate-500 text-xs font-medium">Verifica tus datos antes de subirlos a la red.</p>
+            <h2 className="text-3xl font-black italic uppercase tracking-tighter">Casi listo</h2>
+            <p className="text-slate-500 text-sm font-medium">Revisa que toda tu información sea correcta antes de guardarla.</p>
           </header>
 
-          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar border-y border-slate-50 py-4">
+          <div className="grid md:grid-cols-2 gap-6 max-h-[500px] md:max-h-none overflow-y-auto pr-2 custom-scrollbar border-y border-slate-50 py-6">
             {/* Sección 1: Personal */}
-            <div className="bg-slate-50 p-4 rounded-3xl relative group">
-              <button onClick={() => goToStep(1)} className="absolute top-4 right-4 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
-                <Edit2 size={16} />
+            <div className="bg-slate-50 p-6 rounded-[32px] relative group hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-slate-100">
+              <button onClick={() => goToStep(1)} className="absolute top-6 right-6 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit2 size={18} />
               </button>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1"><User size={10}/> Personal</p>
-              <p className="text-sm font-black text-slate-800 uppercase">{formData.name}</p>
-              <p className="text-[10px] text-slate-500 font-bold">NSS: {formData.nss} • Tel: {formData.phone}</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2"><User size={12}/> Identidad</p>
+              <p className="text-lg font-black text-slate-800 uppercase leading-none mb-2">{formData.name}</p>
+              <div className="space-y-1">
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">NSS: {formData.nss}</p>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">TEL: {formData.phone}</p>
+              </div>
             </div>
 
             {/* Sección 2: Médica */}
-            <div className="bg-slate-50 p-4 rounded-3xl relative group">
-              <button onClick={() => goToStep(2)} className="absolute top-4 right-4 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
-                <Edit2 size={16} />
+            <div className="bg-slate-50 p-6 rounded-[32px] relative group hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-slate-100">
+              <button onClick={() => goToStep(2)} className="absolute top-6 right-6 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit2 size={18} />
               </button>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1"><Droplet size={10}/> Médica</p>
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                <div className="bg-white p-2 rounded-xl border border-slate-100 text-center">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2"><Droplet size={12}/> Datos Médicos</p>
+              <div className="flex gap-2 mb-4">
+                <div className="bg-white px-3 py-2 rounded-xl border border-slate-100 text-center flex-1">
                   <p className="text-[8px] font-bold text-slate-400 uppercase">Sangre</p>
-                  <p className="text-xs font-black text-myhealth-red">{formData.bloodType}</p>
+                  <p className="text-lg font-black text-myhealth-red">{formData.bloodType}</p>
                 </div>
-                <div className="bg-white p-2 rounded-xl border border-slate-100 text-center">
-                  <p className="text-[8px] font-bold text-slate-400 uppercase">Donador</p>
+                <div className="bg-white px-3 py-2 rounded-xl border border-slate-100 text-center flex-1">
+                  <p className="text-[8px] font-bold text-slate-400 uppercase">Donante</p>
                   <p className={`text-xs font-black ${formData.isDonor ? 'text-green-600' : 'text-slate-400'}`}>{formData.isDonor ? 'SÍ' : 'NO'}</p>
                 </div>
-                <div className="bg-white p-2 rounded-xl border border-slate-100 text-center">
-                  <p className="text-[8px] font-bold text-slate-400 uppercase">Religión</p>
-                  <p className="text-[10px] font-black text-slate-800 truncate">{formData.religion || 'N/A'}</p>
-                </div>
               </div>
-              <p className="text-[10px] text-slate-700 font-medium"><strong>Alergias:</strong> <span className="text-red-600 font-bold">{formData.allergies || 'Ninguna'}</span></p>
-              <p className="text-[10px] text-slate-700 font-medium"><strong>Crónica:</strong> {formData.chronicDisease || 'Ninguna'}</p>
+              <div className="space-y-2">
+                <p className="text-[11px] text-slate-700 font-medium"><strong>Alergias:</strong> <span className="text-red-600 font-black uppercase">{formData.allergies || 'Ninguna'}</span></p>
+                <p className="text-[11px] text-slate-700 font-medium leading-relaxed truncate"><strong>Historial:</strong> {formData.history || 'Ninguno registrado'}</p>
+              </div>
             </div>
 
-            {/* Sección 3: Seguridad */}
-            <div className="bg-slate-50 p-4 rounded-3xl relative group">
-              <button onClick={() => goToStep(4)} className="absolute top-4 right-4 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
-                <Edit2 size={16} />
+            {/* Sección 3: Contacto */}
+            <div className="bg-slate-50 p-6 rounded-[32px] relative group hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-slate-100">
+              <button onClick={() => goToStep(3)} className="absolute top-6 right-6 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit2 size={18} />
               </button>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1"><Lock size={10}/> Seguridad</p>
-              <p className="text-sm font-black text-slate-800 uppercase tracking-widest">PIN: ****</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2"><Phone size={12} className="text-myhealth-red" /> Contacto SOS</p>
+              <p className="text-sm font-black text-slate-800 uppercase">{formData.contact1Name}</p>
+              <p className="text-xs text-slate-500 font-bold uppercase mt-1">{formData.contact1Relation} • {formData.contact1Phone}</p>
+            </div>
+
+            {/* Sección 4: Seguridad */}
+            <div className="bg-slate-50 p-6 rounded-[32px] relative group hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-slate-100">
+              <button onClick={() => goToStep(4)} className="absolute top-6 right-6 text-myhealth-blue opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit2 size={18} />
+              </button>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2"><Lock size={12}/> Seguridad</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xl font-black text-slate-800 tracking-widest">****</p>
+                <span className="text-[10px] bg-blue-100 text-myhealth-blue px-2 py-0.5 rounded-full font-bold">CIFRADO</span>
+              </div>
             </div>
           </div>
 
-          <div className="pt-4 space-y-3">
-            <button onClick={handleFinish} className="w-full bg-myhealth-blue text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-all">
-              VINCULAR Y GUARDAR
+          <div className="pt-4">
+            <button onClick={handleFinish} className="w-full bg-myhealth-blue hover:bg-blue-600 text-white py-6 rounded-[32px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-500/20 active:scale-95 transition-all text-lg">
+              VINCULAR Y GUARDAR EN BLOCKCHAIN
             </button>
+            <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-6 flex items-center justify-center gap-2">
+              <ShieldCheck size={12} /> Procesamiento seguro vía Monad Testnet
+            </p>
           </div>
         </div>
       )}
