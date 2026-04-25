@@ -171,19 +171,19 @@ const EmergencyAction = () => {
 
           <div className={`p-8 rounded-[32px] border-4 ${basicData?.allergies ? 'border-red-600 bg-red-600 text-white' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
             <p className={`text-sm font-black uppercase mb-2 ${basicData?.allergies ? 'text-red-100' : 'text-slate-400'}`}>Alergias Críticas</p>
-            <p className="text-3xl md:text-5xl font-black leading-tight uppercase">
+            <p className="text-3xl md:text-5xl font-black leading-tight uppercase break-words">
               {basicData?.allergies || 'Ninguna registrada'}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
             <div className="bg-slate-900 text-white p-6 rounded-[32px]">
               <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Donante</p>
               <p className="text-2xl font-black uppercase">{basicData?.isDonor ? 'SÍ' : 'NO'}</p>
             </div>
-            <div className="bg-slate-100 p-6 rounded-[32px]">
+            <div className="bg-slate-100 p-6 rounded-[32px] overflow-hidden">
               <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Seguro Social</p>
-              <p className="text-xl font-black text-slate-800">{basicData?.nss}</p>
+              <p className="text-xl font-black text-slate-800 break-all">{basicData?.nss}</p>
             </div>
           </div>
         </div>
