@@ -20,7 +20,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+# --omit=optional: fsevents (darwin) en el lockfile de macOS rompe npm ci en Linux.
+RUN npm ci --omit=dev --omit=optional
 COPY backend ./backend
 COPY landing ./landing
 COPY INTEGRACION_APP.md ./INTEGRACION_APP.md
