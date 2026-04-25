@@ -1,0 +1,240 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MyHealth API",
+    "version": "1.0.0",
+    "description": "Ficha medica y contactos on-chain (MyHealth, Monad 10143). En este prototipo un contrato = una ficha (un titular); 'contract' permite leer otra direccion ademas del .env. En productivo, un despliegue por paciente."
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Local (cambia host/puerto en la app)" },
+    { "url": "https://TUNEL.ngrok.app", "description": "Ejemplo: tunel hacia el backend del equipo" }
+  ],
+  "tags": [
+    { "name": "meta" },
+    { "name": "ficha" },
+    { "name": "escritura" },
+    { "name": "emergencia" },
+    { "name": "mapa", "description": "Alertas del mapa de monitoreo (memoria o contrato si MAPA_EMERGENCIA_ONCHAIN=1)" },
+    { "name": "backoffice" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "MapaEmergenciaKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Solo si el servidor define MAPA_EMERGENCIA_KEY. Alternativa: header X-Mapa-Key con el mismo valor."
+      }
+    },
+    "parameters": {
+      "ContractQuery": {
+        "name": "contract",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "string" },
+        "description": "Direccion del contrato MyHealth (0x). Si se omite, se usa MYHEALTH_CONTRACT_ADDRESS del .env del servidor (si esta definido)."
+      }
+    }
+  },
+  "paths": {
+    "/api": {
+      "get": {
+        "tags": ["meta"],
+        "summary": "Metadatos, red, contrato default",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["meta"],
+        "summary": "Health check",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/datos": {
+      "get": {
+        "tags": ["ficha"],
+        "summary": "Ficha (solo campos, sin listado de contactos)",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "OK" } }
+      },
+      "patch": {
+        "tags": ["escritura"],
+        "summary": "Actualizar un solo campo de la ficha",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contract": { "type": "string" },
+                  "alergias": { "type": "string" },
+                  "condiciones": { "type": "string" },
+                  "medicacion": { "type": "string" },
+                  "notaEmergencia": { "type": "string" },
+                  "notificar": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/ficha": {
+      "get": {
+        "tags": ["ficha"],
+        "summary": "Ficha + contactos de emergencia activos",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/contactos": {
+      "get": {
+        "tags": ["ficha"],
+        "summary": "Solo contactos",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "OK" } }
+      },
+      "post": {
+        "tags": ["escritura"],
+        "summary": "Anadir contacto de emergencia en cadena",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contract": { "type": "string" },
+                  "nombre": { "type": "string" },
+                  "telefono": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/ficha/actualizar": {
+      "post": {
+        "tags": ["escritura"],
+        "summary": "Guardar ficha (varias transacciones). Requiere que CUENTA del servidor sea owner del 'contract' indicado.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contract": { "type": "string" },
+                  "alergias": { "type": "string" },
+                  "condiciones": { "type": "string" },
+                  "medicacion": { "type": "string" },
+                  "notaEmergencia": { "type": "string" },
+                  "fotoUrl": { "type": "string" },
+                  "religion": { "type": "string" },
+                  "numeroSeguroSocial": { "type": "string" },
+                  "tipoSangre": { "type": "string" },
+                  "perfilNombre": { "type": "string" },
+                  "perfilApellido": { "type": "string" },
+                  "perfilTelefono": { "type": "string" },
+                  "perfilCorreo": { "type": "string" },
+                  "notificar": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/contactos/{indice}/desactivar": {
+      "post": {
+        "tags": ["escritura"],
+        "summary": "Desactivar contacto por indice (backoffice)",
+        "parameters": [
+          { "name": "indice", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "contract": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/emergencia/alerta": {
+      "post": {
+        "tags": ["emergencia"],
+        "summary": "Notificar a contactos (y opc. registrarLectura on-chain)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contract": { "type": "string" },
+                  "registrarSoloLectura": { "type": "boolean" },
+                  "notificar": { "type": "boolean" },
+                  "mensaje": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/mapa-de-emergencias/alerta": {
+      "get": {
+        "tags": ["mapa"],
+        "summary": "Estado de la alerta para el mapa (polling)",
+        "description": "Lectura sin autenticacion. Con MAPA_EMERGENCIA_ONCHAIN=1 el servidor lee leerEmergenciaMapa() del contrato (?contract= opcional).",
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": {
+          "200": {
+            "description": "activa false o true con id, lat, lng, nombrePaciente, detalle, emitidoEn, fuente (memoria|chain)"
+          }
+        }
+      },
+      "post": {
+        "tags": ["mapa"],
+        "summary": "Registrar o actualizar emergencia en mapa",
+        "description": "403 si MAPA_EMERGENCIA_KEY esta definida y falta clave. Con on-chain el servidor firma registrarEmergenciaMapa; incluir contract en query o body si no usais el .env default.",
+        "security": [{ "MapaEmergenciaKey": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["lat", "lng"],
+                "properties": {
+                  "lat": { "type": "number", "description": "WGS84" },
+                  "lng": { "type": "number" },
+                  "nombrePaciente": { "type": "string" },
+                  "detalle": { "type": "string" },
+                  "contract": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "ok + datos" }, "401": { "description": "Clave de mapa" } }
+      },
+      "delete": {
+        "tags": ["mapa"],
+        "summary": "Quitar emergencia (memoria o limpiarEmergenciaMapa on-chain)",
+        "security": [{ "MapaEmergenciaKey": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/ContractQuery" }],
+        "responses": { "200": { "description": "ok" } }
+      }
+    }
+  }
+}

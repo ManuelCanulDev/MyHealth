@@ -1,0 +1,7 @@
+node_modules/
+build/
+out/
+cache/
+.env
+data/miinfo.json
+.DS_Store

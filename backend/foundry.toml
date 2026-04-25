@@ -1,0 +1,22 @@
+# Monad: EVM prague y solc 0.8.28+ (ver docs y SKILL monad-development)
+# https://docs.monad.xyz
+
+[profile.default]
+src = "contracts"
+out = "out"
+libs = ["lib"]
+test = "test"
+script = "script"
+evm_version = "prague"
+solc_version = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+remappings = ["forge-std/=lib/forge-std/src/"]
+
+# Evita "note[...]" en cada `forge build` (no son fallos, solo sugerencias de estilo)
+[lint]
+lint_on_build = false
+
+# Chain ID 10143 (testnet) — al desplegar con forge script
+[rpc_endpoints]
+monadTestnet = "https://testnet-rpc.monad.xyz"
