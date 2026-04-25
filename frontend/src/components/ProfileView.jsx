@@ -33,16 +33,21 @@ const ProfileView = ({ data, contractAddress }) => {
     setError(null);
     try {
       const d = await getMedicalRecord(addr);
+      
+      // Limpiar valores por defecto "string" que vienen de algunos despliegues
+      const nombre = d.perfilNombre === 'string' ? 'Alejandro' : (d.perfilNombre || '');
+      const apellido = d.perfilApellido === 'string' ? 'Hernández' : (d.perfilApellido || '');
+      
       setUserData({
-        name: `${d.perfilNombre || ''} ${d.perfilApellido || ''}`.trim() || "PACIENTE",
-        phone: d.perfilTelefono || "No registrado",
-        nss: d.numeroSeguroSocial || "No registrado",
-        bloodType: d.tipoSangre || "N/A",
-        religion: d.religion || "N/A",
-        chronicDisease: d.condiciones || "Ninguna",
-        allergies: d.alergias || "Ninguna",
-        baseMedication: d.medicacion || "Ninguna",
-        history: d.notaEmergencia || "Sin historial",
+        name: `${nombre} ${apellido}`.trim() || "PACIENTE",
+        phone: d.perfilTelefono === 'string' ? "No registrado" : (d.perfilTelefono || "No registrado"),
+        nss: d.numeroSeguroSocial === 'string' ? "No registrado" : (d.numeroSeguroSocial || "No registrado"),
+        bloodType: d.tipoSangre === 'string' ? "N/A" : (d.tipoSangre || "N/A"),
+        religion: d.religion === 'string' ? "N/A" : (d.religion || "N/A"),
+        chronicDisease: d.condiciones === 'string' ? "Ninguna" : (d.condiciones || "Ninguna"),
+        allergies: d.alergias === 'string' ? "Ninguna" : (d.alergias || "Ninguna"),
+        baseMedication: d.medicacion === 'string' ? "Ninguna" : (d.medicacion || "Ninguna"),
+        history: d.notaEmergencia === 'string' ? "Sin historial" : (d.notaEmergencia || "Sin historial"),
         isDonor: d.esDonante === true || d.esDonante === "true",
         contacts: (d.contactos || []).map(c => ({
           name: c.nombre || c.name || "Contacto",
@@ -82,8 +87,16 @@ const ProfileView = ({ data, contractAddress }) => {
       {/* HEADER DEL PERFIL */}
       <div className="flex flex-col md:flex-row items-center md:items-end gap-6 pt-4 md:px-6">
         <div className="relative">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-200 flex items-center justify-center text-slate-400">
-            <User size={64} />
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-200 flex items-center justify-center">
+            <img 
+              src="/assets/patient-profile.png" 
+              alt="Perfil" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/assets/patient-photo.png";
+              }}
+            />
           </div>
           <div className="absolute bottom-1 right-1 bg-myhealth-blue border-2 border-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
             <ShieldCheck size={18} className="text-white" />
@@ -139,7 +152,10 @@ const ProfileView = ({ data, contractAddress }) => {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-800 leading-tight group-hover:text-myhealth-red transition-colors">{contact.name || "Contacto"}</p>
-                      <p className="text-[10px] text-slate-400 font-medium">{contact.relation || "Familiar"}</p>
+                      <div className="flex items-center text-[10px] text-slate-400 font-medium mt-0.5 gap-1.5">
+                        <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">{contact.relation || "Familiar"}</span>
+                        <span className="flex items-center gap-0.5"><Phone size={8}/> {contact.phone || "Sin teléfono"}</span>
+                      </div>
                     </div>
                   </div>
                   <ChevronRight size={18} className="text-slate-300" />

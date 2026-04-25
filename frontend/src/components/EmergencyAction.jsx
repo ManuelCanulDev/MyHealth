@@ -34,17 +34,22 @@ const EmergencyAction = () => {
       setTimeout(async () => {
         try {
           const data = await getMedicalRecord(contractAddress);
+
+          // Limpiar valores por defecto "string"
+          const nombre = data.perfilNombre === 'string' ? 'PACIENTE' : (data.perfilNombre || 'PACIENTE');
+          const apellido = data.perfilApellido === 'string' ? '' : (data.perfilApellido || '');
+
           // Adaptar datos del API al formato del componente
           const formattedData = {
-            name: `${data.perfilNombre || ''} ${data.perfilApellido || ''}`.trim() || "PACIENTE DESCONOCIDO",
-            bloodType: data.tipoSangre || "N/A",
-            allergies: data.alergias || "Ninguna registrada",
-            nss: data.numeroSeguroSocial || "No disponible",
-            religion: data.religion || "No especificada",
-            chronicDisease: data.condiciones || "Ninguna registrada",
-            baseMedication: data.medicacion || "Sin medicación",
+            name: `${nombre} ${apellido}`.trim() || "PACIENTE DESCONOCIDO",
+            bloodType: data.tipoSangre === 'string' ? "N/A" : (data.tipoSangre || "N/A"),
+            allergies: data.alergias === 'string' ? "Ninguna registrada" : (data.alergias || "Ninguna registrada"),
+            nss: data.numeroSeguroSocial === 'string' ? "No disponible" : (data.numeroSeguroSocial || "No disponible"),
+            religion: data.religion === 'string' ? "No especificada" : (data.religion || "No especificada"),
+            chronicDisease: data.condiciones === 'string' ? "Ninguna registrada" : (data.condiciones || "Ninguna registrada"),
+            baseMedication: data.medicacion === 'string' ? "Sin medicación" : (data.medicacion || "Sin medicación"),
             isDonor: data.esDonante === true || data.esDonante === "true",
-            history: data.notaEmergencia || "Sin notas adicionales",
+            history: data.notaEmergencia === 'string' ? "Sin notas adicionales" : (data.notaEmergencia || "Sin notas adicionales"),
             contacts: data.contactos || []
           };
           setBasicData(formattedData);
@@ -52,9 +57,9 @@ const EmergencyAction = () => {
         } catch (e) {
           console.error(e);
           setError(e.message);
-          setStep('idle');
+          setStep('error');
         }
-      }, 2000);
+      }, 1500);
     }, 2000);
   };
 

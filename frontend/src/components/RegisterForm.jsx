@@ -6,6 +6,7 @@ const RegisterForm = ({ onComplete }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
+    lastName: '',
     phone: '',
     nss: '',
     bloodType: '',
@@ -40,6 +41,7 @@ const RegisterForm = ({ onComplete }) => {
 
     const formattedData = {
       name: formData.name,
+      lastName: formData.lastName,
       phone: formData.phone,
       nss: formData.nss,
       bloodType: formData.bloodType,
@@ -80,6 +82,7 @@ const RegisterForm = ({ onComplete }) => {
         numeroSeguroSocial: formData.nss,
         tipoSangre: formData.bloodType,
         perfilNombre: formData.name,
+        perfilApellido: formData.lastName,
         perfilTelefono: formData.phone,
         notificar: false
       };
@@ -143,9 +146,14 @@ const RegisterForm = ({ onComplete }) => {
           </header>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className={labelStyle}>Nombre Completo</label>
-              <input type="text" className={inputStyle} placeholder="Nombre y Apellidos" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+            <div>
+              <label className={labelStyle}>Nombre</label>
+              <input type="text" className={inputStyle} placeholder="Nombre" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+            </div>
+
+            <div>
+              <label className={labelStyle}>Apellido</label>
+              <input type="text" className={inputStyle} placeholder="Apellido" value={formData.lastName} onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
             </div>
 
             <div>
@@ -158,7 +166,7 @@ const RegisterForm = ({ onComplete }) => {
             </div>
           </div>
 
-          <button onClick={handleNext} disabled={!formData.name || !formData.nss} className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 mt-6 hover:bg-slate-800 transition-colors">
+          <button onClick={handleNext} disabled={!formData.name || !formData.lastName || !formData.nss} className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 mt-6 hover:bg-slate-800 transition-colors">
             Siguiente Paso <ArrowRight size={18} />
           </button>
         </div>
@@ -326,7 +334,7 @@ const RegisterForm = ({ onComplete }) => {
                 <Edit2 size={18} />
               </button>
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2"><User size={12}/> Identidad</p>
-              <p className="text-lg font-black text-slate-800 uppercase leading-none mb-2">{formData.name}</p>
+              <p className="text-lg font-black text-slate-800 uppercase leading-none mb-2">{formData.name} {formData.lastName}</p>
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">NSS: {formData.nss}</p>
                 <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">TEL: {formData.phone}</p>
