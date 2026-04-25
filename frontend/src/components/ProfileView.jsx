@@ -1,29 +1,75 @@
-import React, { useState } from 'react';
-import { ShieldCheck, CreditCard, ChevronRight, Bell, Eye, FileText, Activity, Phone, Heart, Hash, Globe, Lock, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, CreditCard, ChevronRight, Bell, Eye, FileText, Activity, Phone, Heart, Hash, Globe, Lock, User, AlertCircle } from 'lucide-react';
+import { getMedicalRecord } from '../api';
 
-const ProfileView = ({ data }) => {
-  const [userData] = useState({
-    name: data?.name || "Juan Pérez",
-    phone: data?.phone || "No registrado",
-    nss: data?.nss || "No registrado",
-    bloodType: data?.bloodType || "O+",
-    religion: data?.religion || "No especificada",
-    chronicDisease: data?.chronicDisease || "Ninguna registrada",
-    allergies: data?.allergies || "Ninguna registrada",
-    baseMedication: data?.baseMedication || "Sin medicación",
-    history: data?.history || "Sin historial registrado",
-    isDonor: data?.isDonor ?? false,
-    pin: data?.pin || "****",
-    contacts: data?.contacts || [
-      { 
-        name: "María García", 
-        phone: "+52 33 1234 5678",
-        relation: "Contacto Principal",
-        email: "maria@example.com",
-        active: true
-      }
-    ]
-  });
+const ProfileView = ({ data, contractAddress }) => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (data) {
+      const formatted = {
+        name: data.name || "Paciente",
+        phone: data.phone || "N/A",
+        nss: data.nss || "N/A",
+        bloodType: data.bloodType || "N/A",
+        religion: data.religion || "N/A",
+        chronicDisease: data.chronicDisease || "N/A",
+        allergies: data.allergies || "N/A",
+        baseMedication: data.baseMedication || "N/A",
+        history: data.history || "N/A",
+        isDonor: data.isDonor || false,
+        contacts: data.contacts || []
+      };
+      setUserData(formatted);
+    } else if (contractAddress) {
+      loadFromBlockchain(contractAddress);
+    }
+  }, [data, contractAddress]);
+
+  const loadFromBlockchain = async (addr) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const d = await getMedicalRecord(addr);
+      setUserData({
+        name: `${d.perfilNombre || ''} ${d.perfilApellido || ''}`.trim() || "PACIENTE",
+        phone: d.perfilTelefono || "No registrado",
+        nss: d.numeroSeguroSocial || "No registrado",
+        bloodType: d.tipoSangre || "N/A",
+        religion: d.religion || "N/A",
+        chronicDisease: d.condiciones || "Ninguna",
+        allergies: d.alergias || "Ninguna",
+        baseMedication: d.medicacion || "Ninguna",
+        history: d.notaEmergencia || "Sin historial",
+        isDonor: d.esDonante === true || d.esDonante === "true",
+        contacts: d.contactos || []
+      });
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-20 animate-pulse text-slate-400">
+      <Activity size={48} className="animate-spin mb-4" />
+      <p className="font-black uppercase tracking-widest text-[10px]">Consultando Monad Blockchain...</p>
+    </div>
+  );
+
+  if (error) return (
+    <div className="bg-red-50 border-2 border-red-100 p-8 rounded-[40px] text-center space-y-4">
+      <AlertCircle size={48} className="mx-auto text-red-500" />
+      <h3 className="text-xl font-black uppercase italic text-red-600">Error de Conexión</h3>
+      <p className="text-slate-500 text-sm font-medium">{error}</p>
+      <button onClick={() => window.location.reload()} className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px]">Reintentar</button>
+    </div>
+  );
+
+  if (!userData) return null;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">

@@ -2,52 +2,64 @@ import React, { useState } from 'react';
 import { ShieldAlert, MapPin, Cpu, CheckCircle2, AlertCircle, Droplet, Phone, FileText, Lock, Unlock, Heart, Hash } from 'lucide-react';
 import ActivityView from './ActivityView';
 
+import { getMedicalRecord, triggerEmergencyAlert } from '../api';
+
 const EmergencyAction = () => {
   const [step, setStep] = useState('idle'); 
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [pin, setPin] = useState('');
   const [location, setLocation] = useState(null);
   const [basicData, setBasicData] = useState(null);
+  const [error, setError] = useState(null);
+  const [testContract, setTestContract] = useState('');
 
-  const fetchFullData = async (id) => {
-    return {
-      name: "JUAN PÉREZ",
-      bloodType: "O+",
-      allergies: "Penicilina",
-      nss: "1234-56-7890",
-      religion: "Católico",
-      chronicDisease: "Diabetes Tipo 2",
-      baseMedication: "Metformina / Insulina",
-      isDonor: true,
-      history: "Cirugía de Apéndice (2024), Tratamiento Hipertensión desde 2023.",
-      contacts: [
-        { name: "María (Esposa)", phone: "+52 33 1234 5678", email: "maria@example.com", relation: "Esposa", active: true },
-        { name: "Carlos (Hijo)", phone: "+52 33 8765 4321", email: "carlos@example.com", relation: "Hijo", active: true }
-      ]
-    };
-  };
-
-  const handleStartScan = () => {
+  const handleStartScan = (forcedAddress = null) => {
+    const contractAddress = forcedAddress || testContract || "nfc_001";
+    
     setStep('scanning');
+    setError(null);
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setLocation(loc);
+        // Opcional: enviar alerta automática al detectar NFC
+        // triggerEmergencyAlert(contractAddress, loc, "Escaneo de emergencia iniciado");
       }, (err) => {
         console.warn("GPS Requerido para protocolizar el rescate");
       });
     }
 
-    // Simulación de 4 segundos en total
     setTimeout(() => {
-      setStep('loading'); // Cambia a "Validando..."
+      setStep('loading'); 
       
       setTimeout(async () => {
-        const data = await fetchFullData("nfc_001");
-        setBasicData(data);
-        setStep('success');
-      }, 2000); // Otros 2 segundos validando
-    }, 2000); // 2 segundos buscando
+        try {
+          const data = await getMedicalRecord(contractAddress);
+          // Adaptar datos del API al formato del componente
+          const formattedData = {
+            name: `${data.perfilNombre || ''} ${data.perfilApellido || ''}`.trim() || "PACIENTE DESCONOCIDO",
+            bloodType: data.tipoSangre || "N/A",
+            allergies: data.alergias || "Ninguna registrada",
+            nss: data.numeroSeguroSocial || "No disponible",
+            religion: data.religion || "No especificada",
+            chronicDisease: data.condiciones || "Ninguna registrada",
+            baseMedication: data.medicacion || "Sin medicación",
+            isDonor: data.esDonante === true || data.esDonante === "true",
+            history: data.notaEmergencia || "Sin notas adicionales",
+            contacts: data.contactos || []
+          };
+          setBasicData(formattedData);
+          setStep('success');
+        } catch (e) {
+          console.error(e);
+          setError(e.message);
+          setStep('idle');
+        }
+      }, 2000);
+    }, 2000);
   };
+
 
   const handleAuthorize = () => {
     if (pin === '1234') { 
@@ -60,11 +72,37 @@ const EmergencyAction = () => {
   // --- RENDERIZADO CONDICIONAL ---
   if (step === 'idle') {
     return (
-      <div className="max-w-2xl mx-auto w-full">
-        <button onClick={handleStartScan} className="w-full bg-myhealth-red text-white py-12 rounded-[40px] shadow-2xl shadow-red-200 flex flex-col items-center gap-4 active:scale-95 transition-all">
+      <div className="max-w-2xl mx-auto w-full space-y-6">
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 p-4 rounded-2xl flex items-center gap-3 text-red-600 animate-in shake duration-500">
+            <AlertCircle size={20} />
+            <p className="text-sm font-bold">{error}</p>
+          </div>
+        )}
+        
+        <button onClick={() => handleStartScan()} className="w-full bg-myhealth-red text-white py-12 rounded-[40px] shadow-2xl shadow-red-200 flex flex-col items-center gap-4 active:scale-95 transition-all">
           <Cpu size={56} className="animate-pulse" />
           <span className="text-2xl font-black italic tracking-tighter uppercase leading-none">Escanear Brazalete NFC</span>
         </button>
+
+        <div className="p-6 bg-slate-50 rounded-[32px] border border-slate-200 space-y-3">
+          <p className="text-[10px] font-black uppercase text-slate-400 text-center tracking-widest">Modo Desarrollador / Pruebas</p>
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Dirección del Contrato (0x...)" 
+              className="flex-1 p-3 rounded-xl border border-slate-200 text-xs font-mono outline-none focus:border-myhealth-blue transition-colors"
+              value={testContract}
+              onChange={(e) => setTestContract(e.target.value)}
+            />
+            <button 
+              onClick={() => handleStartScan()}
+              className="bg-slate-900 text-white px-4 rounded-xl text-[10px] font-black uppercase tracking-tighter"
+            >
+              Cargar
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
