@@ -44,7 +44,7 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-md mx-auto">
+      <main className="max-w-4xl mx-auto min-h-[calc(100-160px)]">
         {activeTab === 'home' && (
           <LandingPage 
             onStartEmergency={() => setActiveTab('emergency')} 
@@ -53,7 +53,7 @@ function App() {
         )}
 
         {activeTab === 'emergency' && (
-          <div className="p-6 space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="p-6 space-y-8 animate-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
             <div className="text-center space-y-2">
               <h2 className="text-3xl font-black leading-none tracking-tight uppercase italic text-slate-800">
                 Modo <span className="text-myhealth-red">Rescate</span>
@@ -69,7 +69,7 @@ function App() {
         {activeTab === 'profile' && (
           <div className="p-6 space-y-6">
             {!isRegistered ? (
-              <div className="text-center py-12 space-y-6">
+              <div className="text-center py-12 space-y-6 max-w-sm mx-auto">
                 <div className="bg-slate-100 w-20 h-20 rounded-full mx-auto flex items-center justify-center text-slate-400">
                   <User size={40} />
                 </div>
@@ -91,24 +91,24 @@ function App() {
         )}
 
         {activeTab === 'register' && (
-          <div className="p-6">
+          <div className="p-6 max-w-2xl mx-auto">
             <RegisterForm onComplete={handleRegistrationComplete} />
           </div>
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
-        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto md:max-w-lg md:bottom-6 md:rounded-full md:shadow-2xl md:border md:border-slate-200 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
+        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'home' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Home size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Inicio</span>
         </button>
 
-        <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Activity size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Rescate</span>
         </button>
 
-        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-all ${['profile', 'register'].includes(activeTab) ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
+        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${['profile', 'register'].includes(activeTab) ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
           <User size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Perfil</span>
         </button>
