@@ -1,12 +1,12 @@
 # MyHealth API (Node + artefacto Foundry para el ABI)
 FROM node:20-bookworm-slim AS builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates \
+RUN apt-get update && apt-get install -y --no-install-recommends bash git curl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Foundry: compilar el contrato y dejar out/MyHealth.sol/MyHealth.json
+# Foundry: el instalador usa `set -o pipefail` (bash); `| sh` usa dash y falla.
 ENV PATH="/root/.foundry/bin:${PATH}"
-RUN curl -L https://foundry.paradigm.xyz | sh && /root/.foundry/bin/foundryup
+RUN curl -L https://foundry.paradigm.xyz | bash && /root/.foundry/bin/foundryup
 WORKDIR /app
 COPY foundry.toml ./
 COPY contracts ./contracts
