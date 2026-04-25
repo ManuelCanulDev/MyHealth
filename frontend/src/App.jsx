@@ -4,10 +4,11 @@ import EmergencyAction from './components/EmergencyAction';
 import ProfileView from './components/ProfileView';
 import RegisterForm from './components/RegisterForm';
 import ActivityView from './components/ActivityView';
-import { Activity, User, Home, History } from 'lucide-react';
+import MonitoringMap from './components/MonitoringMap';
+import { Activity, User, Home, History, Map as MapIcon } from 'lucide-react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home'); // home, emergency, profile, register
+  const [activeTab, setActiveTab] = useState('home'); // home, emergency, profile, register, monitoring
   const [isRegistered, setIsRegistered] = useState(false);
   const [userData, setUserData] = useState(null);
   const [autoScan, setAutoScan] = useState(false);
@@ -50,6 +51,16 @@ function App() {
             onStartEmergency={() => setActiveTab('emergency')} 
             onStartRegister={() => setActiveTab('register')} 
           />
+        )}
+
+        {activeTab === 'monitoring' && (
+          <div className="p-6 space-y-6 animate-in fade-in duration-500">
+            <div className="text-center space-y-2 mb-4">
+              <h2 className="text-3xl font-black italic uppercase tracking-tighter text-slate-800">Central de <span className="text-myhealth-blue">Monitoreo</span></h2>
+              <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em]">Geolocalización inmutable en tiempo real</p>
+            </div>
+            <MonitoringMap />
+          </div>
         )}
 
         {activeTab === 'emergency' && (
@@ -97,10 +108,15 @@ function App() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto md:max-w-lg md:bottom-6 md:rounded-full md:shadow-2xl md:border md:border-slate-200 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 p-4 flex justify-around items-center max-w-md mx-auto md:max-w-2xl md:bottom-6 md:rounded-full md:shadow-2xl md:border md:border-slate-200 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-[32px]">
         <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'home' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
           <Home size={22} />
           <span className="text-[9px] font-black uppercase tracking-tighter">Inicio</span>
+        </button>
+
+        <button onClick={() => setActiveTab('monitoring')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'monitoring' ? 'text-myhealth-blue scale-110' : 'text-slate-300'}`}>
+          <MapIcon size={22} />
+          <span className="text-[9px] font-black uppercase tracking-tighter">Mapa</span>
         </button>
 
         <button onClick={() => setActiveTab('emergency')} className={`flex flex-col items-center gap-1 transition-all hover:scale-110 ${activeTab === 'emergency' ? 'text-myhealth-red scale-110' : 'text-slate-300'}`}>
@@ -118,3 +134,4 @@ function App() {
 }
 
 export default App;
+
