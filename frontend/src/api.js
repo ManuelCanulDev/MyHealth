@@ -1,4 +1,11 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+function getApiBaseUrl() {
+  if (typeof window !== "undefined" && window.__ENV__ && window.__ENV__.VITE_API_URL) {
+    return window.__ENV__.VITE_API_URL;
+  }
+  return import.meta.env.VITE_API_URL || "http://localhost:3000";
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Obtiene la ficha médica de un contrato específico.
