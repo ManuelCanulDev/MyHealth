@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mihealth-red: #E11D48;
+  --color-mihealth-blue: #2563EB;
+}
