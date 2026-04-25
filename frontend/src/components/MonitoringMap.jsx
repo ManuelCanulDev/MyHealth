@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { ShieldAlert, MapPin, Activity, Bell, X, CheckCircle2 } from 'lucide-react';
+import { getEmergencyMapAlert } from '../api';
 
 const MonitoringMap = () => {
   const mapContainer = useRef(null);
@@ -10,6 +11,8 @@ const MonitoringMap = () => {
   const [lat] = useState(20.6736);
   const [zoom] = useState(15);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertData, setAlertData] = useState(null);
+  const emergencyMarker = useRef(null);
 
   useEffect(() => {
     if (map.current) return; // stops map from initializing more than once
@@ -68,14 +71,7 @@ const MonitoringMap = () => {
         map.current.resize();
       });
 
-      // Simular alerta después de 5 segundos para el demo
-      const timer = setTimeout(() => {
-        setShowAlert(true);
-        triggerEmergencyVisuals();
-      }, 5000);
-
       return () => {
-        clearTimeout(timer);
         if (map.current) {
           map.current.remove();
           map.current = null;
@@ -86,12 +82,13 @@ const MonitoringMap = () => {
     }
   }, [lng, lat, zoom]);
 
-  const triggerEmergencyVisuals = () => {
+  const triggerEmergencyVisuals = (emgLng, emgLat) => {
     if (!map.current) return;
 
-    // Ubicación simulada del accidente (cerca de REDi)
-    const emgLng = -103.3455;
-    const emgLat = 20.6750;
+    // Si ya hay un marcador, lo movemos o lo quitamos para poner el nuevo
+    if (emergencyMarker.current) {
+      emergencyMarker.current.remove();
+    }
 
     const emgEl = document.createElement('div');
     emgEl.innerHTML = `
@@ -103,7 +100,7 @@ const MonitoringMap = () => {
       </div>
     `;
 
-    new maplibregl.Marker(emgEl)
+    emergencyMarker.current = new maplibregl.Marker(emgEl)
       .setLngLat([emgLng, emgLat])
       .addTo(map.current);
 
@@ -114,6 +111,35 @@ const MonitoringMap = () => {
       duration: 2000
     });
   };
+
+  // Polling para alertas reales
+  useEffect(() => {
+    const checkAlert = async () => {
+      try {
+        const data = await getEmergencyMapAlert();
+        if (data.activa) {
+          setAlertData(data);
+          setShowAlert(true);
+          triggerEmergencyVisuals(data.lng, data.lat);
+        } else {
+          // Si ya no está activa, podemos limpiar el marcador si queremos
+          if (emergencyMarker.current) {
+            emergencyMarker.current.remove();
+            emergencyMarker.current = null;
+          }
+          setShowAlert(false);
+          setAlertData(null);
+        }
+      } catch (err) {
+        console.error("Error consultando alertas:", err);
+      }
+    };
+
+    const interval = setInterval(checkAlert, 5000);
+    checkAlert(); // Check immediately on mount
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="relative w-full h-[calc(100vh-200px)] min-h-[500px] rounded-[40px] overflow-hidden border-4 border-slate-200 shadow-2xl bg-slate-100 flex flex-col">
@@ -128,12 +154,12 @@ const MonitoringMap = () => {
         </div>
         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-tight">
           Central: REDi Guadalajara<br />
-          Estado: Escaneando Blockchain...
+          Estado: {showAlert ? '¡Emergencia Detectada!' : 'Escaneando Blockchain...'}
         </p>
       </div>
 
-      {/* Modal de Alerta Simulada */}
-      {showAlert && (
+      {/* Modal de Alerta Real */}
+      {showAlert && alertData && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-6 bg-red-950/20 backdrop-blur-[2px] animate-in fade-in duration-500">
           <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl border-2 border-red-600 overflow-hidden animate-in zoom-in-95 duration-300 pointer-events-auto">
             <div className="bg-red-600 p-6 text-white flex items-center gap-4">
@@ -154,7 +180,7 @@ const MonitoringMap = () => {
                 <MapPin className="text-red-600 shrink-0" size={20} />
                 <div>
                   <p className="text-[10px] font-black text-slate-400 uppercase">Ubicación Detectada</p>
-                  <p className="text-sm font-bold text-slate-800">C. de Gante, Las Nueve Esquinas (A 150m de REDi)</p>
+                  <p className="text-sm font-bold text-slate-800">{alertData.detalle || 'Coordenadas: ' + alertData.lat + ', ' + alertData.lng}</p>
                 </div>
               </div>
 
@@ -162,7 +188,9 @@ const MonitoringMap = () => {
                 <Activity className="text-red-600 shrink-0" size={20} />
                 <div>
                   <p className="text-[10px] font-black text-red-400 uppercase">Estado Vital</p>
-                  <p className="text-sm font-black text-red-600 uppercase">Escaneo NFC: Juan Pérez (O+)</p>
+                  <p className="text-sm font-black text-red-600 uppercase">
+                    Paciente: {alertData.nombrePaciente || 'No identificado'}
+                  </p>
                 </div>
               </div>
 

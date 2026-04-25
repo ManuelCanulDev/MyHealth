@@ -88,6 +88,22 @@ export const triggerEmergencyAlert = async (contractAddress, location, details) 
 };
 
 /**
+ * Obtiene el estado actual del mapa de emergencias.
+ */
+export const getEmergencyMapAlert = async () => {
+  const response = await fetch(`${getApiBaseUrl()}/api/mapa-de-emergencias/alerta`);
+  if (!response.ok) {
+    try {
+      const error = await response.json();
+      throw new Error(error.error || 'Error al obtener alerta del mapa');
+    } catch (_) {
+      throw new Error('Error al obtener alerta del mapa');
+    }
+  }
+  return response.json();
+};
+
+/**
  * Agrega un contacto de emergencia.
  * @param {string} contractAddress 
  * @param {Object} data { nombre, parentesco, telefono, email }
@@ -109,3 +125,4 @@ export const addEmergencyContact = async (contractAddress, data) => {
   }
   return response.json();
 };
+
