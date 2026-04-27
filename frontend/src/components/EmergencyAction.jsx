@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, MapPin, Cpu, CheckCircle2, AlertCircle, Droplet, Phone, FileText, Lock, Unlock, Heart, Hash } from 'lucide-react';
+import { ShieldAlert, MapPin, Cpu, CheckCircle2, AlertCircle, Droplet, Phone, FileText, Lock, Unlock, Heart, Hash, Search } from 'lucide-react';
 import ActivityView from './ActivityView';
 
 import { getMedicalRecord, triggerEmergencyAlert } from '../api';
@@ -16,50 +16,52 @@ const EmergencyAction = () => {
   const handleStartScan = (forcedAddress = null) => {
     const contractAddress = forcedAddress || testContract || "nfc_001";
     
-    setStep('scanning');
+    setStep('loading');
     setError(null);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setLocation(loc);
-        // Opcional: enviar alerta automática al detectar NFC
-        // triggerEmergencyAlert(contractAddress, loc, "Escaneo de emergencia iniciado");
       }, (err) => {
         console.warn("GPS Requerido para protocolizar el rescate");
       });
     }
 
-    setTimeout(() => {
-      setStep('loading'); 
-      
-      setTimeout(async () => {
-        try {
-          const data = await getMedicalRecord(contractAddress);
-          // Adaptar datos del API al formato del componente
-          const formattedData = {
-            name: `${data.perfilNombre || ''} ${data.perfilApellido || ''}`.trim() || "PACIENTE DESCONOCIDO",
-            bloodType: data.tipoSangre || "N/A",
-            allergies: data.alergias || "Ninguna registrada",
-            nss: data.numeroSeguroSocial || "No disponible",
-            religion: data.religion || "No especificada",
-            chronicDisease: data.condiciones || "Ninguna registrada",
-            baseMedication: data.medicacion || "Sin medicación",
-            isDonor: data.esDonante === true || data.esDonante === "true",
-            history: data.notaEmergencia || "Sin notas adicionales",
-            contacts: data.contactos || []
-          };
-          setBasicData(formattedData);
-          setStep('success');
-        } catch (e) {
-          console.error(e);
-          setError(e.message);
-          setStep('idle');
-        }
-      }, 2000);
+    setTimeout(async () => {
+      try {
+        const data = await getMedicalRecord(contractAddress);
+
+        // Limpiar valores por defecto "string"
+        const nombre = data.perfilNombre === 'string' ? 'PACIENTE' : (data.perfilNombre || 'PACIENTE');
+        const apellido = data.perfilApellido === 'string' ? '' : (data.perfilApellido || '');
+
+        // Adaptar datos del API al formato del componente
+        const formattedData = {
+          name: `${nombre} ${apellido}`.trim() || "PACIENTE DESCONOCIDO",
+          bloodType: data.tipoSangre === 'string' ? "N/A" : (data.tipoSangre || "N/A"),
+          allergies: data.alergias === 'string' ? "Ninguna registrada" : (data.alergias || "Ninguna registrada"),
+          nss: data.numeroSeguroSocial === 'string' ? "No disponible" : (data.numeroSeguroSocial || "No disponible"),
+          religion: data.religion === 'string' ? "No especificada" : (data.religion || "No especificada"),
+          chronicDisease: data.condiciones === 'string' ? "Ninguna registrada" : (data.condiciones || "Ninguna registrada"),
+          baseMedication: data.medicacion === 'string' ? "Sin medicación" : (data.medicacion || "Sin medicación"),
+          isDonor: data.esDonante === true || data.esDonante === "true",
+          history: data.notaEmergencia === 'string' ? "Sin notas adicionales" : (data.notaEmergencia || "Sin notas adicionales"),
+          contacts: (data.contactos || []).map(c => ({
+            name: c.nombre || c.name || "Contacto",
+            relation: c.parentesco || c.relation || "Familiar",
+            phone: c.telefono || c.phone || "No registrado"
+          }))
+        };
+        setBasicData(formattedData);
+        setStep('success');
+      } catch (e) {
+        console.error(e);
+        setError(e.message);
+        setStep('error');
+      }
     }, 2000);
   };
-
 
   const handleAuthorize = () => {
     if (pin === '1234') { 
@@ -72,34 +74,41 @@ const EmergencyAction = () => {
   // --- RENDERIZADO CONDICIONAL ---
   if (step === 'idle') {
     return (
-      <div className="max-w-2xl mx-auto w-full space-y-6">
+      <div className="max-w-2xl mx-auto w-full space-y-8">
         {error && (
           <div className="bg-red-50 border-2 border-red-200 p-4 rounded-2xl flex items-center gap-3 text-red-600 animate-in shake duration-500">
             <AlertCircle size={20} />
             <p className="text-sm font-bold">{error}</p>
           </div>
         )}
-        
-        <button onClick={() => handleStartScan()} className="w-full bg-myhealth-red text-white py-12 rounded-[40px] shadow-2xl shadow-red-200 flex flex-col items-center gap-4 active:scale-95 transition-all">
-          <Cpu size={56} className="animate-pulse" />
-          <span className="text-2xl font-black italic tracking-tighter uppercase leading-none">Escanear Brazalete NFC</span>
-        </button>
 
-        <div className="p-6 bg-slate-50 rounded-[32px] border border-slate-200 space-y-3">
-          <p className="text-[10px] font-black uppercase text-slate-400 text-center tracking-widest">Modo Desarrollador / Pruebas</p>
-          <div className="flex gap-2">
+        <div className="p-8 md:p-12 bg-white rounded-[40px] border-2 border-slate-100 shadow-2xl space-y-6">
+          <div className="text-center space-y-2">
+            <div className="bg-myhealth-blue/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search size={32} className="text-myhealth-blue" />
+            </div>
+            <h3 className="text-2xl font-black uppercase tracking-widest text-slate-800">
+              Búsqueda de Paciente
+            </h3>
+            <p className="text-sm font-bold text-slate-500">
+              Ingresa el identificador único (Wallet 0x...) para acceder a la ficha médica de emergencia.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4 mt-8">
             <input 
               type="text" 
-              placeholder="Dirección del Contrato (0x...)" 
-              className="flex-1 p-3 rounded-xl border border-slate-200 text-xs font-mono outline-none focus:border-myhealth-blue transition-colors"
+              placeholder="Ej. 0x1234567890ABCDEF..." 
+              className="w-full p-6 rounded-[24px] border-2 border-slate-200 text-lg font-mono outline-none focus:border-myhealth-blue transition-colors text-center bg-slate-50"
               value={testContract}
               onChange={(e) => setTestContract(e.target.value)}
             />
             <button 
-              onClick={() => handleStartScan()}
-              className="bg-slate-900 text-white px-4 rounded-xl text-[10px] font-black uppercase tracking-tighter"
+              onClick={() => handleStartScan(testContract)}
+              disabled={!testContract}
+              className="w-full bg-myhealth-blue text-white py-6 rounded-[24px] text-lg font-black uppercase tracking-widest hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:hover:bg-myhealth-blue shadow-xl shadow-blue-200"
             >
-              Cargar
+              Consultar Historial
             </button>
           </div>
         </div>
@@ -116,7 +125,7 @@ const EmergencyAction = () => {
           <Cpu size={48} className="text-myhealth-blue relative z-10" />
         </div>
         <p className="text-xl font-black italic uppercase tracking-tighter text-center text-slate-800">
-          {step === 'scanning' ? 'Buscando NFC...' : 'NFC detectado, validando informacion...'}
+          Cargando Información del Paciente...
         </p>
       </div>
     );
@@ -162,19 +171,19 @@ const EmergencyAction = () => {
 
           <div className={`p-8 rounded-[32px] border-4 ${basicData?.allergies ? 'border-red-600 bg-red-600 text-white' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
             <p className={`text-sm font-black uppercase mb-2 ${basicData?.allergies ? 'text-red-100' : 'text-slate-400'}`}>Alergias Críticas</p>
-            <p className="text-3xl md:text-5xl font-black leading-tight uppercase">
+            <p className="text-3xl md:text-5xl font-black leading-tight uppercase break-words">
               {basicData?.allergies || 'Ninguna registrada'}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
             <div className="bg-slate-900 text-white p-6 rounded-[32px]">
               <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Donante</p>
               <p className="text-2xl font-black uppercase">{basicData?.isDonor ? 'SÍ' : 'NO'}</p>
             </div>
-            <div className="bg-slate-100 p-6 rounded-[32px]">
+            <div className="bg-slate-100 p-6 rounded-[32px] overflow-hidden">
               <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Seguro Social</p>
-              <p className="text-xl font-black text-slate-800">{basicData?.nss}</p>
+              <p className="text-xl font-black text-slate-800 break-all">{basicData?.nss}</p>
             </div>
           </div>
         </div>
@@ -186,22 +195,28 @@ const EmergencyAction = () => {
             <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
               <Phone size={18} className="text-red-600" /> Llamar a familiares
             </h4>
-            {basicData?.contacts.map((contact, i) => (
-              <a 
-                key={i} 
-                href={`tel:${contact.phone}`} 
-                className="flex items-center justify-between p-6 bg-white rounded-[32px] border-2 border-slate-200 shadow-md active:scale-95 transition-all hover:border-myhealth-blue"
-              >
-                <div className="space-y-1">
-                  <p className="text-2xl font-black text-slate-900 uppercase">{contact.name}</p>
-                  <p className="text-lg font-bold text-myhealth-blue">{contact.phone}</p>
-                  <p className="text-xs font-bold text-slate-400 uppercase">{contact.relation}</p>
-                </div>
-                <div className="bg-red-600 text-white p-5 rounded-2xl shadow-lg shadow-red-200">
-                  <Phone size={32} />
-                </div>
-              </a>
-            ))}
+            {basicData?.contacts && basicData.contacts.length > 0 ? (
+              basicData.contacts.map((contact, i) => (
+                <a 
+                  key={i} 
+                  href={`tel:${contact.phone}`} 
+                  className="flex items-center justify-between p-6 bg-white rounded-[32px] border-2 border-slate-200 shadow-md active:scale-95 transition-all hover:border-myhealth-blue"
+                >
+                  <div className="space-y-1">
+                    <p className="text-2xl font-black text-slate-900 uppercase">{contact.name}</p>
+                    <p className="text-lg font-bold text-myhealth-blue">{contact.phone}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase">{contact.relation}</p>
+                  </div>
+                  <div className="bg-red-600 text-white p-5 rounded-2xl shadow-lg shadow-red-200">
+                    <Phone size={32} />
+                  </div>
+                </a>
+              ))
+            ) : (
+              <div className="p-6 bg-white rounded-[32px] border-2 border-slate-200 text-center">
+                <p className="text-sm font-bold text-slate-400 uppercase">Sin contactos registrados</p>
+              </div>
+            )}
           </div>
 
           {/* ACCESO A BÓVEDA (DISCRETO PERO ACCESIBLE) */}

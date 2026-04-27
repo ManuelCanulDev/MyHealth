@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, CreditCard, ChevronRight, Bell, Eye, FileText, Activity, Phone, Heart, Hash, Globe, Lock, User, AlertCircle } from 'lucide-react';
+import { Activity, Phone, AlertCircle, CheckCircle2, Droplet, Hash } from 'lucide-react';
 import { getMedicalRecord } from '../api';
 
 const ProfileView = ({ data, contractAddress }) => {
@@ -15,10 +15,10 @@ const ProfileView = ({ data, contractAddress }) => {
         nss: data.nss || "N/A",
         bloodType: data.bloodType || "N/A",
         religion: data.religion || "N/A",
-        chronicDisease: data.chronicDisease || "N/A",
-        allergies: data.allergies || "N/A",
-        baseMedication: data.baseMedication || "N/A",
-        history: data.history || "N/A",
+        chronicDisease: data.chronicDisease || "Ninguna registrada",
+        allergies: data.allergies || "Ninguna registrada",
+        baseMedication: data.baseMedication || "Sin medicación",
+        history: data.history || "Sin historial",
         isDonor: data.isDonor || false,
         contacts: data.contacts || []
       };
@@ -33,18 +33,28 @@ const ProfileView = ({ data, contractAddress }) => {
     setError(null);
     try {
       const d = await getMedicalRecord(addr);
+      
+      // Limpiar valores por defecto "string" para evitar nombres falsos
+      const nombre = d.perfilNombre === 'string' ? 'PACIENTE' : (d.perfilNombre || 'PACIENTE');
+      const apellido = d.perfilApellido === 'string' ? '' : (d.perfilApellido || '');
+      
       setUserData({
-        name: `${d.perfilNombre || ''} ${d.perfilApellido || ''}`.trim() || "PACIENTE",
-        phone: d.perfilTelefono || "No registrado",
-        nss: d.numeroSeguroSocial || "No registrado",
-        bloodType: d.tipoSangre || "N/A",
-        religion: d.religion || "N/A",
-        chronicDisease: d.condiciones || "Ninguna",
-        allergies: d.alergias || "Ninguna",
-        baseMedication: d.medicacion || "Ninguna",
-        history: d.notaEmergencia || "Sin historial",
+        name: `${nombre} ${apellido}`.trim() || "PACIENTE DESCONOCIDO",
+        phone: d.perfilTelefono === 'string' ? "No registrado" : (d.perfilTelefono || "No registrado"),
+        nss: d.numeroSeguroSocial === 'string' ? "No disponible" : (d.numeroSeguroSocial || "No disponible"),
+        bloodType: d.tipoSangre === 'string' ? "N/A" : (d.tipoSangre || "N/A"),
+        religion: d.religion === 'string' ? "No especificada" : (d.religion || "No especificada"),
+        chronicDisease: d.condiciones === 'string' ? "Ninguna registrada" : (d.condiciones || "Ninguna registrada"),
+        allergies: d.alergias === 'string' ? "Ninguna registrada" : (d.alergias || "Ninguna registrada"),
+        baseMedication: d.medicacion === 'string' ? "Sin medicación" : (d.medicacion || "Sin medicación"),
+        history: d.notaEmergencia === 'string' ? "Sin notas adicionales" : (d.notaEmergencia || "Sin notas adicionales"),
         isDonor: d.esDonante === true || d.esDonante === "true",
-        contacts: d.contactos || []
+        contacts: (d.contactos || []).map(c => ({
+          name: c.nombre || c.name || "Contacto",
+          relation: c.parentesco || c.relation || "Familiar",
+          phone: c.telefono || c.phone || "No registrado",
+          email: c.email || "No registrado"
+        }))
       });
     } catch (e) {
       setError(e.message);
@@ -71,160 +81,143 @@ const ProfileView = ({ data, contractAddress }) => {
 
   if (!userData) return null;
 
+  const hasAllergies = userData.allergies && userData.allergies.toLowerCase() !== 'ninguna registrada' && userData.allergies.toLowerCase() !== 'ninguna' && userData.allergies.toLowerCase() !== 'n/a';
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-12">
+    <div className="w-full animate-in fade-in duration-500 pb-20">
       
-      {/* HEADER DEL PERFIL */}
-      <div className="flex flex-col md:flex-row items-center md:items-end gap-6 pt-4 md:px-6">
-        <div className="relative">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-200 flex items-center justify-center text-slate-400">
-            <User size={64} />
+      {/* CABECERA CON FOTO (Estilo Emergencia) */}
+      <div className="bg-red-600 text-white p-8 rounded-t-[40px] flex flex-col md:flex-row items-center gap-6 md:gap-8 shadow-inner relative">
+        {contractAddress && (
+          <div className="absolute top-4 right-6 bg-black/20 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 hidden md:block">
+            <p className="text-[10px] font-mono font-bold tracking-widest text-white/90">WALLET: {contractAddress}</p>
           </div>
-          <div className="absolute bottom-1 right-1 bg-myhealth-blue border-2 border-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
-            <ShieldCheck size={18} className="text-white" />
+        )}
+        
+        <div className="relative shrink-0">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-white/20">
+            <img 
+              src="/assets/patient-photo.png" 
+              alt="Foto del paciente" 
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200"; }}
+            />
           </div>
         </div>
-        
-        <div className="text-center md:text-left">
-          <h2 className="text-2xl md:text-4xl font-black text-slate-900 italic tracking-tighter uppercase">{userData.name}</h2>
-          <div className="flex items-center justify-center md:justify-start gap-2 mt-1">
-            <div className="bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-              <span className="text-[8px] font-bold text-amber-600 uppercase">Monad ID</span>
-            </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{userData.nss}</p>
+        <div className="text-center md:text-left space-y-2">
+          <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+            <CheckCircle2 size={18} className="text-red-200" />
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-red-200">Ficha Médica Activa</p>
           </div>
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">{userData.name}</h2>
+          {contractAddress && (
+            <p className="md:hidden text-[9px] font-mono font-bold tracking-widest text-red-200 mt-2 bg-black/10 inline-block px-2 py-1 rounded-full break-all">
+              {contractAddress}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* COLUMNA IZQUIERDA: INFORMACIÓN Y CONTACTOS */}
-        <div className="md:col-span-1 space-y-8">
-          {/* SECCIÓN 1: DATOS DE IDENTIDAD */}
-          <section className="space-y-4">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
-              <ShieldCheck size={14} /> Identidad
-            </h3>
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
-              <div>
-                <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Hash size={10}/> NSS</p>
-                <p className="text-sm font-bold text-slate-800">{userData.nss}</p>
-              </div>
-              <div>
-                <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Phone size={10}/> Teléfono</p>
-                <p className="text-sm font-bold text-slate-800">{userData.phone}</p>
-              </div>
-              <div className="pt-3 border-t border-slate-50">
-                <p className="text-[9px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Lock size={10}/> PIN de Seguridad</p>
-                <p className="text-xs font-mono font-bold text-slate-500">**** (Configurado)</p>
-              </div>
+      <div className="grid md:grid-cols-2 gap-4 bg-white rounded-b-[40px] shadow-2xl overflow-hidden border-2 border-red-600">
+        
+        {/* BLOQUE 1: DATOS VITALES */}
+        <div className="p-8 space-y-8 border-b md:border-b-0 md:border-r border-slate-100">
+          
+          <div className="flex items-center justify-between gap-6 bg-red-50 p-8 rounded-[32px] border-2 border-red-200">
+            <div className="space-y-1">
+              <p className="text-sm font-black text-red-600 uppercase">Tipo de Sangre</p>
+              <p className="text-7xl md:text-9xl font-black text-red-600 leading-none">{userData.bloodType}</p>
             </div>
-          </section>
+            <Droplet size={80} className="text-red-600 opacity-20" />
+          </div>
 
-          {/* SECCIÓN 3: RED DE APOYO */}
-          <section className="space-y-4">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
-              <Bell size={14} className="text-myhealth-red" /> Contactos SOS
-            </h3>
-            <div className="space-y-3">
+          <div className={`p-8 rounded-[32px] border-4 ${hasAllergies ? 'border-red-600 bg-red-600 text-white' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
+            <p className={`text-sm font-black uppercase mb-2 ${hasAllergies ? 'text-red-100' : 'text-slate-400'}`}>Alergias Críticas</p>
+            <p className="text-3xl md:text-5xl font-black leading-tight uppercase break-words">
+              {userData.allergies}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="bg-slate-900 text-white p-6 rounded-[32px]">
+              <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Donante</p>
+              <p className="text-2xl font-black uppercase">{userData.isDonor ? 'SÍ' : 'NO'}</p>
+            </div>
+            <div className="bg-slate-100 p-6 rounded-[32px] overflow-hidden">
+              <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Seguro Social / ID</p>
+              <p className="text-xl font-black text-slate-800 break-all">{userData.nss}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* BLOQUE 2: CONTACTOS Y MÁS INFO */}
+        <div className="p-8 space-y-8 bg-slate-50/50 flex flex-col">
+          
+          {userData.contacts && userData.contacts.length > 0 ? (
+            <div className="space-y-4">
+              <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                <Phone size={18} className="text-red-600" /> Contactos de Emergencia
+              </h4>
               {userData.contacts.map((contact, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-white rounded-[24px] shadow-sm border border-slate-100 group hover:border-myhealth-red transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-myhealth-red/10 rounded-full flex items-center justify-center text-myhealth-red text-xs font-black">
-                      {contact.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-800 leading-tight group-hover:text-myhealth-red transition-colors">{contact.name}</p>
-                      <p className="text-[10px] text-slate-400 font-medium">{contact.relation}</p>
-                    </div>
+                <a 
+                  key={i} 
+                  href={`tel:${contact.phone}`} 
+                  className="flex items-center justify-between p-6 bg-white rounded-[32px] border-2 border-slate-200 shadow-md active:scale-95 transition-all hover:border-myhealth-blue"
+                >
+                  <div className="space-y-1">
+                    <p className="text-2xl font-black text-slate-900 uppercase">{contact.name}</p>
+                    <p className="text-lg font-bold text-myhealth-blue">{contact.phone}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase">{contact.relation}</p>
                   </div>
-                  <ChevronRight size={18} className="text-slate-300" />
-                </div>
+                  <div className="bg-red-600 text-white p-5 rounded-2xl shadow-lg shadow-red-200">
+                    <Phone size={32} />
+                  </div>
+                </a>
               ))}
             </div>
-          </section>
-        </div>
+          ) : (
+            <div className="p-6 bg-white rounded-[32px] border-2 border-slate-200 text-center">
+              <p className="text-sm font-bold text-slate-400 uppercase">Sin contactos registrados</p>
+            </div>
+          )}
 
-        {/* COLUMNA DERECHA: FICHA MÉDICA (MAS ANCHA EN ESCRITORIO) */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-              <Eye size={14} className="text-myhealth-red" /> Ficha Médica Completa
-            </h3>
-            <span className="text-[9px] bg-red-100 text-myhealth-red px-2 py-0.5 rounded-full font-bold uppercase">Acceso Rápido</span>
-          </div>
-
-          <div className="bg-white rounded-[40px] p-8 shadow-xl border-l-[12px] border-myhealth-red relative overflow-hidden h-full">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <Activity size={120} />
+          {/* HISTORIAL MÉDICO ABIERTO */}
+          <div className="mt-auto p-8 bg-blue-600 text-white rounded-[32px] shadow-xl space-y-4">
+            <p className="text-xs font-black uppercase tracking-widest text-blue-200">Historial Médico Registrado</p>
+            <p className="text-xl font-bold leading-relaxed">{userData.history}</p>
+            
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-blue-500">
+              <div>
+                <p className="text-[10px] font-black uppercase text-blue-200">Enfermedades</p>
+                <p className="text-sm font-black">{userData.chronicDisease}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase text-blue-200">Medicación</p>
+                <p className="text-sm font-black">{userData.baseMedication}</p>
+              </div>
             </div>
             
-            <div className="relative z-10 space-y-8">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 flex flex-col justify-center">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Grupo Sanguíneo</p>
-                  <p className="text-4xl md:text-5xl font-black text-myhealth-red leading-none">{userData.bloodType}</p>
-                </div>
-                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 flex flex-col justify-center">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Donador Org.</p>
-                  <p className={`text-xl md:text-2xl font-black leading-none ${userData.isDonor ? 'text-green-600' : 'text-slate-400'}`}>
-                    {userData.isDonor ? 'SÍ, ACTIVO' : 'NO'}
-                  </p>
-                </div>
-                <div className="bg-slate-50 p-6 md:p-8 rounded-[32px] border border-slate-100 md:col-span-1 col-span-2 flex flex-col justify-center">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3">Creencias / Religión</p>
-                  <p className="text-lg md:text-xl font-black text-slate-800 leading-none">{userData.religion}</p>
-                </div>
+            {(userData.religion && userData.religion !== 'No especificada' && userData.religion !== 'N/A') && (
+              <div className="pt-4 border-t border-blue-500 mt-4">
+                <p className="text-[10px] font-black uppercase text-blue-200">Religión / Creencias</p>
+                <p className="text-sm font-black">{userData.religion}</p>
               </div>
-
-              <div className="grid md:grid-cols-2 gap-6 md:gap-8 pt-4">
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
-                      <ShieldAlert size={12} className="text-myhealth-red" /> Alergias Críticas
-                    </p>
-                    <div className="bg-red-50 p-6 rounded-[32px] border border-red-100">
-                      <p className="text-sm md:text-base font-black text-red-600 uppercase leading-relaxed">{userData.allergies}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
-                      <Activity size={12} className="text-myhealth-blue" /> Enfermedades
-                    </p>
-                    <div className="bg-blue-50 p-6 rounded-[32px] border border-blue-100">
-                      <p className="text-sm md:text-base font-black text-myhealth-blue uppercase italic">{userData.chronicDisease}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="h-full flex flex-col">
-                    <p className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1 tracking-widest mb-3">
-                      <FileText size={12} /> Historial & Medicación
-                    </p>
-                    <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 flex-1 flex flex-col justify-between">
-                      <div>
-                        <p className="text-xs font-bold text-slate-500 uppercase mb-3">Notas Médicas:</p>
-                        <p className="text-sm md:text-base font-semibold text-slate-700 leading-relaxed">{userData.history}</p>
-                      </div>
-                      <div className="mt-6 pt-6 border-t border-slate-200">
-                        <p className="text-[10px] font-black text-myhealth-blue uppercase mb-1">Medicamento Base:</p>
-                        <p className="text-sm font-bold text-slate-800">{userData.baseMedication}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
+
         </div>
       </div>
 
-      <div className="p-8 bg-slate-50 rounded-[40px] border border-dashed border-slate-200 text-center">
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-          Sincronizado de forma segura con Monad Blockchain • ID: 0x{Math.random().toString(16).slice(2, 10).toUpperCase()}
-        </p>
-      </div>
-
+      {contractAddress && (
+        <div className="flex justify-center py-8 mt-4">
+          <div className="flex items-center gap-3 bg-slate-50 px-6 py-3 rounded-full border border-slate-100 shadow-sm">
+            <Hash size={16} className="text-slate-400" />
+            <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
+              CONTRATO INTELIGENTE: {contractAddress}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
