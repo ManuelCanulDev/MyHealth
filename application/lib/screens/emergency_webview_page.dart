@@ -5,7 +5,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:grupokamar_myhealth/config/patient_nfc_config.dart';
 
-/// Carga [kEmergencyWebUrl] integrada en la app (no sale al navegador del sistema).
+/// Carga [kEmergencyWebOpenUrl] (base + contrato) integrada en la app.
 class EmergencyWebViewPage extends StatefulWidget {
   const EmergencyWebViewPage({super.key});
 
@@ -21,7 +21,7 @@ class _EmergencyWebViewPageState extends State<EmergencyWebViewPage> {
   @override
   void initState() {
     super.initState();
-    final uri = Uri.tryParse(kEmergencyWebUrl);
+    final uri = Uri.tryParse(kEmergencyWebOpenUrl);
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -69,7 +69,7 @@ class _EmergencyWebViewPageState extends State<EmergencyWebViewPage> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  'No se pudo abrir la página. Revisa kEmergencyWebUrl en patient_nfc_config.dart',
+                  'No se pudo abrir la página. Revisa kEmergencyWebUrl y kPatientContractAddress en patient_nfc_config.dart',
                   textAlign: TextAlign.center,
                   style: t.textTheme.bodyLarge?.copyWith(
                     color: t.colorScheme.error,

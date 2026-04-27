@@ -2,13 +2,16 @@
 
 /// Instrucción en la pestaña de tarjeta.
 const String kNfcApoyeTelefonoTagPaciente =
-    'Apoye el telefono para leer el tag del paiciente.';
+    'Apoye el telefono para leer el tag del paciente.';
 
 // --- Vista previa (contrato en red Monad) ---
 
 /// Contrato de paciente mostrado en la pantalla de preview (no el UUID leído del tag).
 const String kPatientContractAddress =
     '0x88a935692Dbf2704aB5EF855fD6C9bfa9c38129D';
+
+/// Titular de la ficha (p. ej. `nombrePaciente` en el mapa de emergencias on-chain vía el API).
+const String kNombreTitularFicha = 'Agripino Flores';
 
 /// Red donde vive el contrato.
 const String kPreviewNetworkName = 'Monad';
@@ -42,13 +45,17 @@ const String kLocationErrorConfig =
 
 // --- Emergencia: web abriendo dentro de la app (WebView) ---
 
-/// URL que se carga al pulsar «Es una emergencia». Cámbiala por la de tu servicio.
-const String kEmergencyWebUrl = 'https://www.monad.xyz/';
+/// Base de la web de emergencia (sin el contrato). El navegador abre [kEmergencyWebOpenUrl].
+const String kEmergencyWebUrl = 'https://my-health.grupokamar.com.mx/paciente/';
+
+/// Página final: [kEmergencyWebUrl] + [kPatientContractAddress] (misma ficha).
+const String kEmergencyWebOpenUrl = '$kEmergencyWebUrl$kPatientContractAddress';
 
 /// Base del API MyHealth (`server.js`: OpenAPI en `/openapi.json`), **sin** `/` final.
 /// Ejemplos: `https://api.tu-dominio.com` o en emulador Android `http://10.0.2.2:3000` (requisito HTTP: cleartext en Android o solo HTTPS en producción).
 /// Si queda **vacía**, al pulsar «Es una emergencia» solo se abre la web de emergencia (sin `POST` al backend).
-const String kMyHealthApiBaseUrl = '';
+const String kMyHealthApiBaseUrl = 'https://monad.grupokamar.com.mx';
 
 /// Misma clave que `MAPA_EMERGENCIA_KEY` en el `.env` del backend, para `POST /api/mapa-de-emergencias/alerta` si aplica. Vacía = sin header.
-const String kMapaEmergenciaApiKey = '';
+const String kMapaEmergenciaApiKey =
+    '414f276d3f6c6a16a468e5d8f86a652237a76058c2714743a1855f704d2d90c6';

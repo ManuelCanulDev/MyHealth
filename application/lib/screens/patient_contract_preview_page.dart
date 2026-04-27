@@ -54,8 +54,20 @@ class _PatientContractPreviewPageState extends State<PatientContractPreviewPage>
                   const CircularProgressIndicator(),
                   const SizedBox(height: 20),
                   Text(
-                    'Registrando en el servidor y la red…',
-                    style: t.textTheme.bodyLarge,
+                    'Propagando la emergencia a la red…',
+                    style: t.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Se envía a la red blockchain ($kPreviewNetworkName) y al servidor. '
+                    'Esto asegura un registro trazable; puede tardar unos segundos.',
+                    style: t.textTheme.bodySmall?.copyWith(
+                      color: t.colorScheme.onSurfaceVariant,
+                      height: 1.35,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -224,8 +236,8 @@ class _PatientContractPreviewPageState extends State<PatientContractPreviewPage>
                   const SizedBox(height: 12),
                   Text(
                     kMyHealthApiBaseUrl.trim().isEmpty
-                        ? 'Configura kMyHealthApiBaseUrl y el backend para registrar la lectura y el mapa en cadena, o solo se abrirá la web.'
-                        : 'Se notificará al backend (y en cadena si aplica) y luego se abrirá la página de emergencia.',
+                        ? 'Configura kMyHealthApiBaseUrl y el backend para propagar a la red en cadena, o solo se abrirá la web de emergencia.'
+                        : 'Al pulsar, la emergencia se propaga a la red blockchain ($kPreviewNetworkName) y al servidor; luego se abre la página de emergencia.',
                     textAlign: TextAlign.center,
                     style: t.textTheme.bodySmall?.copyWith(
                       color: t.colorScheme.onSurfaceVariant,

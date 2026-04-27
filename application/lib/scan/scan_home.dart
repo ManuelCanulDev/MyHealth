@@ -366,6 +366,7 @@ class _ScanHomePageState extends State<ScanHomePage>
           fullscreenDialog: true,
         ),
       );
+      await _resumeScanningAfterContract();
     }
   }
 
@@ -373,6 +374,35 @@ class _ScanHomePageState extends State<ScanHomePage>
     HapticFeedback.lightImpact();
     setState(() => _nfcError = null);
     _startNfcSession();
+  }
+
+  /// Tras cerrar el detalle del contrato: no dejar “Listo” / QR anterior ni el botón NFC; reinicia escaneo.
+  Future<void> _resumeScanningAfterContract() async {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _lastQr = null;
+      _qrError = null;
+      _qrWantsScan = true;
+    });
+    if (_tabIndex == 0) {
+      HapticFeedback.lightImpact();
+      setState(() => _nfcError = null);
+      _startNfcSession();
+      return;
+    }
+    try {
+      await _qrController?.start();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _qrError =
+              'No se pudo abrir la cámara. Revisa el permiso en ajustes.';
+          _qrWantsScan = false;
+        });
+      }
+    }
   }
 
   Future<void> _onQrDetect(BarcodeCapture capture) async {
@@ -404,6 +434,7 @@ class _ScanHomePageState extends State<ScanHomePage>
         fullscreenDialog: true,
       ),
     );
+    await _resumeScanningAfterContract();
   }
 
   Future<void> _qrScanAgain() async {

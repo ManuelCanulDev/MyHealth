@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:grupokamar_myhealth/config/patient_nfc_config.dart';
 import 'package:http/http.dart' as http;
 
 /// Resultado de [MyHealthEmergencyApi.register] (API del backend en `server.js`).
@@ -104,7 +105,7 @@ class MyHealthEmergencyApi {
         'contract': contractAddress,
         'lat': latitude,
         'lng': longitude,
-        'nombrePaciente': 'Paciente',
+        'nombrePaciente': kNombreTitularFicha,
         'detalle': detalle,
       };
       try {
